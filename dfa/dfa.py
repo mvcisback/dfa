@@ -12,9 +12,11 @@ Letter = Hashable
 class DFA:
     start: State
     alphabet: FrozenSet[State] = attr.ib(converter=frozenset)
-    _accept: Callable[[State], bool]
+    _accept: Callable[[State], bool] = attr.ib(
+        converter=fn.memoize
+    )
     _transition: Callable[[State, Letter], State] = attr.ib(
-        converter=fn.memoize  # Memoize the output.
+        converter=fn.memoize
     )
 
     def trace(self, word):
