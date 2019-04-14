@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.6"
+script: pytest --flake8 --cov=dfa --cov-report=html -n2
+cache:
+  directories:
+    - ${HOME}/.cache/pip
+after_success:
+  - codecov
