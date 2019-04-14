@@ -13,7 +13,9 @@ class DFA:
     start: State
     alphabet: FrozenSet[State] = attr.ib(converter=frozenset)
     _accept: Callable[[State], bool]
-    _transition: Callable[[State, Letter], State]
+    _transition: Callable[[State, Letter], State] = attr.ib(
+        converter=fn.memoize  # Memoize the output.
+    )
 
     def trace(self, word):
         state = self.start
