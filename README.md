@@ -17,6 +17,8 @@ A simple python implementation of a DFA.
 
 # Usage
 
+## Construction
+
 ```python
 from dfa import DFA
 
@@ -27,17 +29,27 @@ dfa1 = DFA(
  transition=lambda s, c: (s + c) % 4,
 )
 
-assert dfa1.accepts([1, 1, 1, 1])
-assert not dfa1.accepts([1, 0])
-
-
 dfa2 = DFA(
  start="left",
  alphabet={"move right", "move left"},
  accept=lambda s: s == "left",
  transition=lambda s, c: "left" if c == "move left" else "right",
 )
+```
+
+## Membership Queries
+
+```python
+assert dfa1.accepts([1, 1, 1, 1])
+assert not dfa1.accepts([1, 0])
 
 assert dfa2.accepts(["move right"]*100 + ["move left"])
 assert not dfa2.accepts(["move left", "move right"])
+```
+
+## Transitions and Traces
+
+```python
+assert dfa1.transition([1, 1, 1]) == 3
+assert list(dfa1.trace([1, 1, 1])) == [0, 1, 2, 3]
 ```
