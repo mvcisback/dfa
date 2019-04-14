@@ -13,6 +13,8 @@ A simple python implementation of a DFA.
 2. Alphabet can be any finite sequence of Hashable objects.
 3. Designed to be immutable and hashable (assuming components are
    immutable and hashable).
+4. Design choice to allow transition map and accepting set to be
+   given as functions rather than an explicit `dict` or `set`.
 
 
 # Usage
