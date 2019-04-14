@@ -1,6 +1,6 @@
 # DFA
 
-[![Build Status](https://travis-ci.org/mvcisback/dfa.svg?branch=master)](https://travis-ci.org/mvcisback/dfa)
+[![Build Status](https://travis-ci.com/mvcisback/dfa.svg?branch=master)](https://travis-ci.com/mvcisback/dfa)
 [![codecov](https://codecov.io/gh/mvcisback/DiscreteSignals/branch/master/graph/badge.svg)](https://codecov.io/gh/mvcisback/dfa)
 
 
