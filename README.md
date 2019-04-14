@@ -5,7 +5,9 @@
 [![PyPI version](https://badge.fury.io/py/dfa.svg)](https://badge.fury.io/py/dfa)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A simple python implementation of a DFA. Features:
+A simple python implementation of a DFA. 
+
+**Features:**
 
 1. State can be any Hashable object.
 2. Alphabet can be any finite sequence of Hashable objects.
