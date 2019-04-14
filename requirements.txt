@@ -1,0 +1,9 @@
+attrs==18.2.0
+codecov==2.0.15
+funcy==1.11
+hypothesis==3.66.30 # pyup: ignore
+pytest==3.2.3 # pyup: ignore
+pytest-cov==2.5.1 # pyup: ignore
+pytest-flake8==0.9 # pyup: ignore
+pytest-sugar==0.9.1 # pyup: ignore
+pytest-xdist==1.22.5 # pyup: ignore
