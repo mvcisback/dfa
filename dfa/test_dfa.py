@@ -15,6 +15,7 @@ def test_example1(word):
     assert hash(dfa)
     accept = sum(word) % 4 == 3
     assert dfa.accepts(word) == accept
+    assert dfa.states() == {0, 1, 2, 3}
 
 
 @given(st.lists(
@@ -32,3 +33,4 @@ def test_example2(word):
     assert hash(dfa)
     accept = (len(word) == 0) or (word[-1] == "move left")
     assert dfa.accepts(word) == accept
+    assert dfa.states() == {"left", "right"}

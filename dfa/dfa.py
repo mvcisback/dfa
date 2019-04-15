@@ -33,3 +33,19 @@ class DFA:
 
     def accepts(self, word):
         return self._accept(self.transition(word))
+
+    @fn.memoize()
+    def states(self):
+        visited = set()
+        stack = [self.start]
+        while stack:
+            curr = stack.pop()
+            if curr in visited:
+                continue
+            else:
+                visited.add(curr)
+
+            successors = [self._transition(curr, a) for a in self.alphabet]
+            stack.extend(successors)
+
+        return visited

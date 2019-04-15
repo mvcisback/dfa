@@ -55,3 +55,10 @@ assert not dfa2.accepts(["move left", "move right"])
 assert dfa1.transition([1, 1, 1]) == 3
 assert list(dfa1.trace([1, 1, 1])) == [0, 1, 2, 3]
 ```
+
+## Other
+
+```python
+# Perform a depth first traversal to collect all reachable states.
+assert dfa1.states() == {0, 1, 2, 3}
+```
