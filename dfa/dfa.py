@@ -11,7 +11,7 @@ Letter = Hashable
 @attr.s(frozen=True, auto_attribs=True)
 class DFA:
     start: State
-    alphabet: FrozenSet[State] = attr.ib(converter=frozenset)
+    alphabet: FrozenSet[Letter] = attr.ib(converter=frozenset)
     _accept: Callable[[State], bool] = attr.ib(
         converter=fn.memoize
     )
