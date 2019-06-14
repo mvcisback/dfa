@@ -16,6 +16,18 @@ A simple python implementation of a DFA.
 4. Design choice to allow transition map and accepting set to be
    given as functions rather than an explicit `dict` or `set`.
 
+# Installation
+
+If you just need to use `dfa`, you can just run:
+
+`$ pip install dfa`
+
+For developers, note that this project uses the
+[poetry](https://poetry.eustace.io/) python package/dependency
+management tool. Please familarize yourself with it and then
+run:
+
+`$ poetry install`
 
 # Usage
 
