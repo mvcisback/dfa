@@ -3,6 +3,8 @@ python:
   - "3.6"
 before_install:
 - pip install poetry
+install:
+- poetry install
 script: poetry run pytest --flake8 --cov=dfa --cov-report=html -n2
 cache:
   directories:
