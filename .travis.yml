@@ -1,7 +1,9 @@
 language: python
 python:
   - "3.6"
-script: pytest --flake8 --cov=dfa --cov-report=html -n2
+before_install:
+- pip install poetry
+script: poetry run pytest --flake8 --cov=dfa --cov-report=html -n2
 cache:
   directories:
     - ${HOME}/.cache/pip
