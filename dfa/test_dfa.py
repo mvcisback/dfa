@@ -8,13 +8,13 @@ from dfa import DFA
 def test_example1(word):
     dfa = DFA(
         start=0,
-        alphabet={0, 1},
-        accept=lambda s: (s % 4) == 3,
+        inputs={0, 1},
+        label=lambda s: (s % 4) == 3,
         transition=lambda s, c: (s + c) % 4,
     )
     assert hash(dfa)
     accept = sum(word) % 4 == 3
-    assert dfa.accepts(word) == accept
+    assert dfa.label(word) == accept
     assert dfa.states() == {0, 1, 2, 3}
 
 
@@ -26,11 +26,11 @@ def test_example1(word):
 def test_example2(word):
     dfa = DFA(
         start="left",
-        alphabet=["move right", "move left"],
-        accept=lambda s: s == "left",
+        inputs=["move right", "move left"],
+        label=lambda s: s == "left",
         transition=lambda s, c: "left" if c == "move left" else "right",
     )
     assert hash(dfa)
     accept = (len(word) == 0) or (word[-1] == "move left")
-    assert dfa.accepts(word) == accept
+    assert dfa.label(word) == accept
     assert dfa.states() == {"left", "right"}

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dfa"
-version = "0.1.4"
+version = "0.2.0"
 description = "Python library for modeling DFAs."
 authors = ["Marcell Vazquez-Chanlatte <marcell.vc@eecs.berkeley.edu>"]
 license = "MIT"
