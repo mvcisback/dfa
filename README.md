@@ -101,13 +101,21 @@ dfa3 = DFA(
 the outputs are within the output alphabet.
 
 ```python
-dfa4 = DFA(
+dfa3 = DFA(
     start=0,
     inputs={0, 1},
     label=my_labeler,
     transition=lambda s, c: (s + c) % 4,
     outputs=None,
 )
+```
+
+## Moore Machines
+
+```python
+assert dfa.transduce(()) == ()
+assert dfa.transduce((1,)) == (False,)
+assert dfa.transduce((1, 1, 1, 1)) == (False, False, False, True)
 ```
 
 ## Other

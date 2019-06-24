@@ -16,6 +16,9 @@ def test_example1(word):
     accept = sum(word) % 4 == 3
     assert dfa.label(word) == accept
     assert dfa.states() == {0, 1, 2, 3}
+    assert dfa.transduce(()) == ()
+    assert dfa.transduce((1,)) == (False,)
+    assert dfa.transduce((1, 1, 1, 1)) == (False, False, False, True)
 
 
 @given(st.lists(

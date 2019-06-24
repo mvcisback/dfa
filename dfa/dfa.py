@@ -38,6 +38,9 @@ class DFA:
         assert (self.outputs is None) or (output in self.outputs)
         return output
 
+    def transduce(self, word):
+        return tuple(map(self._label, self.trace(word)))[:-1]
+
     @fn.memoize()
     def states(self):
         visited = set()
