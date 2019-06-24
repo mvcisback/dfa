@@ -112,10 +112,14 @@ dfa3 = DFA(
 
 ## Moore Machines
 
+Finally, by reinterpreting the structure of the `DFA` object, one can
+model a Moore Machine. For example, in 3 state counter, `dfa1`, the
+Moore Machine can output the current count.
+
 ```python
-assert dfa.transduce(()) == ()
-assert dfa.transduce((1,)) == (False,)
-assert dfa.transduce((1, 1, 1, 1)) == (False, False, False, True)
+assert dfa1.transduce(()) == ()
+assert dfa1.transduce((1,)) == (False,)
+assert dfa1.transduce((1, 1, 1, 1)) == (False, False, False, True)
 ```
 
 ## Other
