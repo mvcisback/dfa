@@ -1,4 +1,4 @@
-from typing import Hashable, FrozenSet, Callable
+from typing import Hashable, FrozenSet, Callable, Optional
 
 import attr
 import funcy as fn
@@ -12,13 +12,13 @@ Alphabet = FrozenSet[Letter]
 @attr.s(frozen=True, auto_attribs=True)
 class DFA:
     start: State
-    inputs: Alphabet = attr.ib(converter=frozenset)
     _label: Callable[[State], Letter] = attr.ib(
         converter=fn.memoize
     )
     _transition: Callable[[State, Letter], State] = attr.ib(
         converter=fn.memoize
     )
+    inputs: Optional[Alphabet] = attr.ib(converter=frozenset, default=None)
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
 
     def trace(self, word, *, start=None):
@@ -26,7 +26,7 @@ class DFA:
         yield state
 
         for char in word:
-            assert char in self.inputs
+            assert (self.inputs is None) or (char in self.inputs)
             state = self._transition(state, char)
             yield state
 
@@ -43,6 +43,8 @@ class DFA:
 
     @fn.memoize()
     def states(self):
+        assert self.inputs is not None, "Need to specify inputs field for DFA!"
+
         visited = set()
         stack = [self.start]
         while stack:
