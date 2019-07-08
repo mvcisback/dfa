@@ -18,7 +18,9 @@ class DFA:
     _transition: Callable[[State, Letter], State] = attr.ib(
         converter=fn.memoize
     )
-    inputs: Optional[Alphabet] = attr.ib(converter=frozenset, default=None)
+    inputs: Optional[Alphabet] = attr.ib(
+        converter=lambda x: x if x is None else frozenset(x), default=None
+    )
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
 
     def trace(self, word, *, start=None):
