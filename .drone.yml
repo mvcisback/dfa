@@ -1,0 +1,11 @@
+kind: pipeline
+name: default
+
+steps:
+- name: test
+  image: python:3.7
+  commands:
+  - pip install poetry
+  - poetry install
+  - poetry run pytest --flake8 --cov=lstar
+  - poetry run codecov
