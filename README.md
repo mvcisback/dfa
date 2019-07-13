@@ -6,6 +6,22 @@
 [![PyPI version](https://badge.fury.io/py/dfa.svg)](https://badge.fury.io/py/dfa)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+**Table of Contents**
+
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Membership Queries](#membership-queries)
+    - [Transitions and Traces](#transitions-and-traces)
+    - [Non-boolean output alphabets](#non-boolean-output-alphabets)
+    - [Moore Machines](#moore-machines)
+    - [DFA <-> Dictionary](#dfa---dictionary)
+    - [Computing Reachable States](#computing-reachable-states)
+
+<!-- markdown-toc end -->
+
+
+
 A simple python implementation of a DFA. 
 
 **Features:**
