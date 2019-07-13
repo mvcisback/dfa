@@ -123,7 +123,36 @@ assert dfa1.transduce((1,)) == (False,)
 assert dfa1.transduce((1, 1, 1, 1)) == (False, False, False, True)
 ```
 
-## Other
+## DFA <-> Dictionary
+
+Note that `dfa` provides helper functions for going from a dictionary
+based representation of a deterministic transition system to a `DFA`
+object and back.
+
+```python
+from dfa import dfa2dict, dict2dfa
+
+# DFA encoded a nested dictionaries with the following
+# signature.
+#     <state>: (<label>, {<action>: <next state>})
+
+dfa_dict = {
+    0: (False, {0: 0, 1: 1}),
+    1: (False, {0: 1, 1: 2}),
+    2: (False, {0: 2, 1: 3}), 
+    3: (True, {0: 3, 1: 0})
+}
+
+# Dictionary -> DFA
+dfa = dict2dfa(dfa_dict, start=0)
+
+# DFA -> Dictionary
+dfa_dict2, start = dfa2dict(dfa)
+
+assert (dfa_dict, 0) == (dfa_dict2, start)
+```
+
+## Computing Reachable States
 
 ```python
 # Perform a depth first traversal to collect all reachable states.
