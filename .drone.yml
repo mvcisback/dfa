@@ -10,5 +10,5 @@ steps:
   commands:
   - pip install poetry
   - poetry install
-  - poetry run pytest --flake8 --cov=lstar
+  - poetry run pytest --flake8 --cov=dfa
   - poetry run codecov
