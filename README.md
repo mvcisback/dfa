@@ -173,3 +173,39 @@ assert (dfa_dict, 0) == (dfa_dict2, start)
 # Perform a depth first traversal to collect all reachable states.
 assert dfa1.states() == {0, 1, 2, 3}
 ```
+
+## Visualizing DFAs
+
+`dfa` optionally supports visualizing DFAs using graphviz. To use this
+functionality be sure to install `dfa` using with the `draw` option:
+
+```python
+pip install dfa[draw]
+```
+
+or 
+
+```python
+poetry install -E draw
+```
+
+Then one can simply use `dfa.draw.write_dot` to write a `.dot` file
+representing the DFA. This `.dot` file can be rendered using any
+graphviz supporting tool.
+
+```python
+from dfa.draw import write_dot
+
+write_dot(dfa1, "path/to/dfa1.dot")
+```
+
+Using the `dot` command in linux results in the following rendering of `dfa1`.
+
+`$ dot -Tsvg path/to/dfa1.dot > dfa1.svg`
+
+<figure>
+  <img src="assets/dfa1.svg" alt="visualization of dfa1" width=300px>
+  <figcaption>
+    Visualization of dfa1 using graphviz.
+  </figcaption>
+</figure>
