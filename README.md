@@ -174,6 +174,30 @@ assert (dfa_dict, 0) == (dfa_dict2, start)
 assert dfa1.states() == {0, 1, 2, 3}
 ```
 
+## Sampling Paths
+
+Often times, it is useful to sample a path between two states, say `a`
+and `b`. `dfa` supports this using `dfa.utils.paths`. This function
+returns a generator of words, `w`, such that `dfa.transition(w,
+start=b) == a`. For example:
+
+
+```python
+from dfa.utils import paths
+
+access_strings = paths(
+    dfa1, 
+    start=0,
+    end=1,  # Optional. If not specified returns all paths
+            # starting at `start`.
+    max_length=7,  #  Defaults to float('inf')
+    randomize=True,  #  Randomize the order. Shorter paths still found first.
+)
+
+for word in access_strings:
+    assert dfa1.transition(word, start=0) == 1
+```
+
 ## Visualizing DFAs
 
 `dfa` optionally supports visualizing DFAs using graphviz. To use this

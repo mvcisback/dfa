@@ -22,14 +22,11 @@ def dict2dfa(dfa_dict, start):
     )
 
 
-def paths(dfa_, start, end=None, *, max_length=None, randomize=False):
+def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
     """Generates all paths froms start to end, subject to max_length.
-
-    - max_length=None sets max_length=2*the dfa's number of states.
-    - max_length=float('inf') results in all possible paths.
     """
     if max_length is None:
-        max_length = 2*len(dfa_.states())
+        max_length = float('inf')
 
     def child_map(word_path):
         word, path = word_path
