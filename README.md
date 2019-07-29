@@ -18,6 +18,8 @@ A simple python implementation of a DFA.
     - [Moore Machines](#moore-machines)
     - [DFA <-> Dictionary](#dfa---dictionary)
     - [Computing Reachable States](#computing-reachable-states)
+    - [Sampling Paths](#sampling-paths)
+    - [Visualizing DFAs](#visualizing-dfas)
 
 <!-- markdown-toc end -->
 
