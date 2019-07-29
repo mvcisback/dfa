@@ -24,7 +24,6 @@ A simple python implementation of a DFA.
 <!-- markdown-toc end -->
 
 
-
 **Features:**
 
 1. State can be any Hashable object.
