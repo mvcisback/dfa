@@ -228,7 +228,7 @@ Using the `dot` command in linux results in the following rendering of `dfa1`.
 `$ dot -Tsvg path/to/dfa1.dot > dfa1.svg`
 
 <figure>
-  <img src="assets/dfa1.svg" alt="visualization of dfa1" width=300px>
+  <img src="assets/dfa1.svg" alt="visualization of dfa1" width=500px>
   <figcaption>
     Visualization of dfa1 using graphviz.
   </figcaption>
