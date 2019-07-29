@@ -1,4 +1,5 @@
 import funcy as fn
+from lazytree import LazyTree
 
 from dfa import DFA
 
@@ -19,3 +20,24 @@ def dict2dfa(dfa_dict, start):
         transition=lambda s, c: dfa_dict[s][1][c],
         label=lambda s: dfa_dict[s][0],
     )
+
+
+def paths(dfa_, start, end=None, *, max_length=None, randomize=False):
+    """Generates all paths froms start to end, subject to max_length.
+
+    - max_length=None sets max_length=2*the dfa's number of states.
+    - max_length=float('inf') results in all possible paths.
+    """
+    if max_length is None:
+        max_length = 2*len(dfa_.states())
+
+    def child_map(word_path):
+        word, path = word_path
+        for i in dfa_.inputs:
+            state2 = dfa_.transition((i,), start=path[-1])
+            yield word + (i,), path + (state2,)
+
+    tree = LazyTree(root=((), (dfa_.start,)), child_map=child_map)
+    paths_ = tree.iddfs(max_depth=max_length, randomize=randomize)
+
+    return (word for word, path in paths_ if end is None or path[-1] == end)

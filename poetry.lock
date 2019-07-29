@@ -139,6 +139,18 @@ version = "0.18"
 zipp = ">=0.5"
 
 [[package]]
+category = "main"
+description = "Python library for manipulating infinite trees."
+name = "lazytree"
+optional = false
+python-versions = ">=3.6,<4.0"
+version = "0.3.1"
+
+[package.dependencies]
+attrs = ">=19.1,<20.0"
+funcy = ">=1.12,<2.0"
+
+[[package]]
 category = "dev"
 description = "McCabe checker, plugin for flake8"
 name = "mccabe"
@@ -206,6 +218,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.5.0"
 
 [[package]]
+category = "main"
+description = "Python interface to Graphviz's Dot"
+name = "pydot"
+optional = true
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "1.4.1"
+
+[package.dependencies]
+pyparsing = ">=2.1.4"
+
+[[package]]
 category = "dev"
 description = "passive checker of Python programs"
 name = "pyflakes"
@@ -214,7 +237,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.1.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python parsing module"
 name = "pyparsing"
 optional = false
@@ -361,7 +384,7 @@ python-versions = ">=2.7"
 version = "0.5.2"
 
 [metadata]
-content-hash = "494da47205ce4f7282d19e7cb1b18ca0ceae9fea23b972e689a10440fc02b6ce"
+content-hash = "f7350144a46cc8f1dc98ba40dce7cab175b397782b1f6105ee86173c57949baf"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -380,6 +403,7 @@ funcy = ["3f3fb0387c6083ac692a8ac90565a08c257cc4283dc3b136c15bcb3a3d80ab6d", "49
 hypothesis = ["28b37d04f1267fc40d4272883bde94e53b421b34c8d81cefae28dac8a8774fde", "b34d85cc6ac7eb683f6d8dfa577fd215fcefd7e5d41d0b2dac86cabdb178e194"]
 idna = ["c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407", "ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"]
 importlib-metadata = ["6dfd58dfe281e8d240937776065dd3624ad5469c835248219bd16cf2e12dbeb7", "cb6ee23b46173539939964df59d3d72c3e0c1b5d54b84f1d8a7e912fe43612db"]
+lazytree = ["23096b04eb48743e1e90151c285a604e8281c304c7aaa4abb083c0ccca28fa55", "9e2d5a237dbb9be3388edb26fc8d0d06ae1d41186ff6a8f362d10befb951e1f4"]
 mccabe = ["ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42", "dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"]
 more-itertools = ["3ad685ff8512bf6dc5a8b82ebf73543999b657eded8c11803d9ba6b648986f4d", "8bb43d1f51ecef60d81854af61a3a880555a14643691cc4b64a6ee269c78f09a"]
 packaging = ["0c98a5d0be38ed775798ece1b9727178c4469d9c3b4ada66e8e6b7849f8732af", "9e1cbf8c12b1f1ce0bb5344b8d7ecf66a6f8a6e91bcb0c84593ed6d3ab5c4ab3"]
@@ -387,6 +411,7 @@ parsimonious = ["3add338892d580e0cb3b1a39e4a1b427ff9f687858fdd61097053742391a9f6
 pluggy = ["0825a152ac059776623854c1543d65a4ad408eb3d33ee114dff91e57ec6ae6fc", "b9817417e95936bf75d85d3f8767f7df6cdde751fc40aed3bb3074cbcb77757c"]
 py = ["64f65755aee5b381cea27766a3a147c3f15b9b6b9ac88676de66ba2ae36793fa", "dc639b046a6e2cff5bbe40194ad65936d6ba360b52b3c3fe1d08a82dd50b5e53"]
 pycodestyle = ["95a2219d12372f05704562a14ec30bc76b05a5b297b21a5dfe3f6fac3491ae56", "e40a936c9a450ad81df37f549d676d127b1b66000a6c500caa2b085bc0ca976c"]
+pydot = ["67be714300c78fda5fd52f79ec994039e3f76f074948c67b5ff539b433ad354f", "d49c9d4dd1913beec2a997f831543c8cbd53e535b1a739e921642fe416235f01"]
 pyflakes = ["17dbeb2e3f4d772725c777fabc446d5634d1038f234e77343108ce445ea69ce0", "d976835886f8c5b31d47970ed689944a0262b5f3afa00a5a7b4dc81e5449f8a2"]
 pyparsing = ["1873c03321fc118f4e9746baf201ff990ceb915f433f23b395f5580d1840cb2a", "9b6323ef4ab914af344ba97510e966d64ba91055d6b9afa6b30799340e89cc03"]
 pytest = ["6aa9bc2f6f6504d7949e9df2a756739ca06e58ffda19b5e53c725f7b03fb4aae", "b77ae6f2d1a760760902a7676887b665c086f71e3461c64ed2a312afcedc00d6"]
