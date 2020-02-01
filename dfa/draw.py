@@ -3,7 +3,7 @@ import pydot
 import dfa
 
 
-def write_dot(dfa_, path):
+def write_dot(dfa_: dfa.DFA, path):
     dfa_dict, init = dfa.dfa2dict(dfa_)
 
     nodes = {
