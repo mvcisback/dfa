@@ -19,6 +19,7 @@ A simple python implementation of a DFA.
     - [DFA <-> Dictionary](#dfa---dictionary)
     - [Computing Reachable States](#computing-reachable-states)
     - [Sampling Paths](#sampling-paths)
+    - [Running interactively (Co-Routine API)](#running-interactively-co-routine-api)
     - [Visualizing DFAs](#visualizing-dfas)
 
 <!-- markdown-toc end -->
@@ -208,15 +209,15 @@ to advance `dfa1`'s state back to the start state.
 
 ```python
 
-machine = dfa.run()
+machine = dfa1.run()
 
-start = next(dfa)
+start = next(machine)
 state = None
 
 count = 0
 while state != start:
     count += 1
-    state = dfa.send(1)
+    state = machine.send(1)
 ```
 
 ## Visualizing DFAs
