@@ -199,6 +199,26 @@ for word in access_strings:
     assert dfa1.transition(word, start=0) == 1
 ```
 
+## Running interactively (Co-Routine API)
+
+`dfa` supports interactively stepping through a `DFA` object via
+co-routines. This is particularly useful when using DFA in a control
+loop. For example, the following code counts how many `1`'s it takes
+to advance `dfa1`'s state back to the start state.
+
+```python
+
+machine = dfa.run()
+
+start = next(dfa)
+state = None
+
+count = 0
+while state != start:
+    count += 1
+    state = dfa.send(1)
+```
+
 ## Visualizing DFAs
 
 `dfa` optionally supports visualizing DFAs using graphviz. To use this

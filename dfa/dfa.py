@@ -23,13 +23,19 @@ class DFA:
     )
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
 
-    def trace(self, word, *, start=None):
+    def run(self, *, start=None):
         state = self.start if start is None else start
-        yield state
 
-        for char in word:
+        while True:
+            char = yield state
             assert (self.inputs is None) or (char in self.inputs)
             state = self._transition(state, char)
+
+    def trace(self, word, *, start=None):
+        machine = self.run(start=start)
+
+        for char in fn.concat([None], word):
+            state = machine.send(char)
             yield state
 
     def transition(self, word, *, start=None):
