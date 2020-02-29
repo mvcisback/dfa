@@ -1,16 +1,71 @@
-from typing import Hashable, FrozenSet, Callable, Optional
+from __future__ import annotations
+
+from functools import total_ordering
+from itertools import product
+from typing import Hashable, FrozenSet, Callable, Optional, Union
 
 import attr
 import funcy as fn
 
 
+@attr.s(frozen=True, auto_attribs=True, eq=False)
+@total_ordering
+class SupAlphabet:
+    """Alphabet containing all other alphabets."""
+    def __contains__(self, _):
+        return True
+
+    def __lt__(self, other):
+        return False
+
+    def __eq__(self, other):
+        return isinstance(other, SupAlphabet)
+
+    def __len__(self):
+        raise NotImplementedError("SupAlphabet has no defined length.")
+
+
+@attr.s(frozen=True, auto_attribs=True, repr=False)
+class ProductAlphabet:
+    """Implicit encoding of product alphabet."""
+    left: Alphabet
+    right: Alphabet
+
+    def __contains__(self, elem):
+        assert len(elem) == 2
+        return (elem[0] in self.left) and (elem[1] in self.right)
+
+    def __iter__(self):
+        return product(self.left, self.right)
+
+    def __repr__(self):
+        left, right = map(
+            lambda x: x if isinstance(x, SupAlphabet) else set(x),
+            [self.left, self.right]
+        )
+        return f"{left} x {right}"
+
+    def __len__(self):
+        return len(self.left) * len(self.right)
+
+
 State = Hashable
 Letter = Hashable
-Alphabet = FrozenSet[Letter]
+Alphabet = Union[FrozenSet[Letter], ProductAlphabet, SupAlphabet]
+
+
+def _freeze(alphabet: Optional[Alphabet] = None):
+    if alphabet is None or isinstance(alphabet, SupAlphabet):
+        return SupAlphabet()
+    elif isinstance(alphabet, ProductAlphabet):
+        return alphabet
+    return frozenset(alphabet)
 
 
 @attr.s(frozen=True, auto_attribs=True)
 class DFA:
+    """Represents a Discrete Finite Automaton or Moore Machine."""
+
     start: State
     _label: Callable[[State], Letter] = attr.ib(
         converter=fn.memoize
@@ -18,12 +73,14 @@ class DFA:
     _transition: Callable[[State, Letter], State] = attr.ib(
         converter=fn.memoize
     )
-    inputs: Optional[Alphabet] = attr.ib(
-        converter=lambda x: x if x is None else frozenset(x), default=None
-    )
-    outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
+    inputs: Alphabet = attr.ib(converter=_freeze, default=SupAlphabet())
+    outputs: Alphabet = attr.ib(converter=_freeze, default={True, False})
 
     def run(self, *, start=None):
+        """Creates a co-routine that simulates the automata:
+            - Takes in characters from the input alphabet.
+            - Yields states.
+        """
         state = self.start if start is None else start
 
         while True:
@@ -32,6 +89,9 @@ class DFA:
             state = self._transition(state, char)
 
     def trace(self, word, *, start=None):
+        """Creates a generator that yields the sequence of states that
+        results from reading the word.
+        """
         machine = self.run(start=start)
 
         for char in fn.concat([None], word):
@@ -39,18 +99,22 @@ class DFA:
             yield state
 
     def transition(self, word, *, start=None):
+        """Returns the state the input word accesses."""
         return fn.last(self.trace(word, start=start))
 
     def label(self, word, *, start=None):
+        """Returns the label of the input word."""
         output = self._label(self.transition(word, start=start))
         assert (self.outputs is None) or (output in self.outputs)
         return output
 
     def transduce(self, word, *, start=None):
+        """Returns the labels of the states traced by the input word."""
         return tuple(map(self._label, self.trace(word, start=start)))[:-1]
 
     @fn.memoize()
     def states(self):
+        """Returns set of states in this automaton."""
         assert self.inputs is not None, "Need to specify inputs field for DFA!"
 
         visited = set()
@@ -66,3 +130,24 @@ class DFA:
             stack.extend(successors)
 
         return visited
+
+    def __or__(self, other: DFA) -> DFA:
+        """Perform the synchronous parallel composition of automata."""
+        return DFA(
+            start=(self.start, other.start),
+            label=lambda s: (self._label(s[0]), other._label(s[1])),
+            transition=lambda s, c: (
+                self._transition(s[0], c[0]),
+                other._transition(s[1], c[1]),
+            ),
+            inputs=ProductAlphabet(self.inputs, other.inputs),
+            outputs=ProductAlphabet(self.outputs, other.outputs),
+        )
+
+    def __rshift__(self, other: DFA) -> DFA:
+        """Cascading composition where self's outputs are others's inputs."""
+        raise NotImplementedError
+
+    def __lshift__(self, other: DFA) -> DFA:
+        """Cascading composition where other's outputs are self's inputs."""
+        return other >> self
