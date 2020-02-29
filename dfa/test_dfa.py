@@ -86,6 +86,9 @@ def test_parallel_composition():
     machine11 = machine1 | machine1
 
     assert isinstance(machine11.inputs, ProductAlphabet)
+    assert machine11.inputs == machine11.inputs
+    assert ProductAlphabet({0}, {0}) < machine11.inputs
+
     assert machine11.label([(0, 0), (1, 0)]) == (1, 0)
     assert len(machine11.inputs) == 4
     assert len(machine11.outputs) == 4
@@ -98,3 +101,27 @@ def test_parallel_composition():
     assert (2, 'x') not in machine12.inputs
     with pytest.raises(Exception):
         len(machine12)
+
+
+def test_seq_composition():
+    mod_5 = DFA(
+        start=0,
+        label=lambda s: s,
+        transition=lambda s, c: (s + c) % 5,
+        inputs={0, 1},
+        outputs={0, 1, 2, 3, 4},
+    )
+    eq_0 = DFA(
+        start=0,
+        label=lambda s: s == 0,
+        transition=lambda s, c: c,
+        inputs={0, 1, 2, 3, 4},
+        outputs={True, False}
+    )
+
+    eq_0_mod_5 = eq_0 << mod_5
+    assert eq_0_mod_5.inputs == {0, 1}
+    assert eq_0_mod_5.outputs == {True, False}
+    assert eq_0_mod_5.label([0, 0, 0, 0])
+    assert eq_0_mod_5.label([1, 1, 1, 1, 1])
+    assert not eq_0_mod_5.label([0, 1, 0, 0, 0])

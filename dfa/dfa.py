@@ -25,11 +25,18 @@ class SupAlphabet:
         raise NotImplementedError("SupAlphabet has no defined length.")
 
 
-@attr.s(frozen=True, auto_attribs=True, repr=False)
+@attr.s(frozen=True, auto_attribs=True, repr=False, eq=False)
+@total_ordering
 class ProductAlphabet:
     """Implicit encoding of product alphabet."""
     left: Alphabet
     right: Alphabet
+
+    def __eq__(self, other):
+        return (self.left == other.left) and (self.right == other.right)
+
+    def __lt__(self, other):
+        return (self.left < other.left) and (self.right < other.right)
 
     def __contains__(self, elem):
         assert len(elem) == 2
@@ -146,7 +153,20 @@ class DFA:
 
     def __rshift__(self, other: DFA) -> DFA:
         """Cascading composition where self's outputs are others's inputs."""
-        raise NotImplementedError
+        assert self.outputs <= other.inputs
+
+        def transition(composite_state, left_input):
+            left, right = composite_state
+            left2 = self._transition(left, left_input)
+            right2 = other._transition(right, self._label(left2))
+            return (left2, right2)
+
+        return DFA(
+            start=(self.start, other.start),
+            inputs=self.inputs, outputs=other.outputs,
+            label=lambda s: other._label(s[1]),
+            transition=transition,
+        )
 
     def __lshift__(self, other: DFA) -> DFA:
         """Cascading composition where other's outputs are self's inputs."""
