@@ -12,6 +12,9 @@ import funcy as fn
 @total_ordering
 class SupAlphabet:
     """Alphabet containing all other alphabets."""
+    def __hash__(self):
+        return hash(id(self))
+
     def __contains__(self, _):
         return True
 
@@ -21,9 +24,6 @@ class SupAlphabet:
     def __eq__(self, other):
         return isinstance(other, SupAlphabet)
 
-    def __len__(self):
-        raise NotImplementedError("SupAlphabet has no defined length.")
-
 
 @attr.s(frozen=True, auto_attribs=True, repr=False, eq=False)
 @total_ordering
@@ -31,6 +31,9 @@ class ProductAlphabet:
     """Implicit encoding of product alphabet."""
     left: Alphabet
     right: Alphabet
+
+    def __hash__(self):
+        return hash((self.left, self.right))
 
     def __eq__(self, other):
         return (self.left == other.left) and (self.right == other.right)

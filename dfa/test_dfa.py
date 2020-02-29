@@ -48,6 +48,8 @@ def test_sup_alphabet():
     )
     alphabet = machine1.inputs
 
+    hash(alphabet)  # Make sure hashable.
+
     assert isinstance(alphabet, SupAlphabet)
     assert 'x' in alphabet
 
@@ -85,7 +87,9 @@ def test_parallel_composition():
     )
     machine11 = machine1 | machine1
 
+    hash(machine11.inputs)  # Make sure hashable.
     assert isinstance(machine11.inputs, ProductAlphabet)
+    assert set(machine11.inputs) == {(0, 0), (0, 1), (1, 0), (1, 1)}
     assert machine11.inputs == machine11.inputs
     assert ProductAlphabet({0}, {0}) < machine11.inputs
 
