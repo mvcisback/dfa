@@ -16,10 +16,12 @@ A simple python implementation of a DFA.
     - [Transitions and Traces](#transitions-and-traces)
     - [Non-boolean output alphabets](#non-boolean-output-alphabets)
     - [Moore Machines](#moore-machines)
+    - [Composition](#composition)
     - [DFA <-> Dictionary](#dfa---dictionary)
     - [Computing Reachable States](#computing-reachable-states)
     - [Sampling Paths](#sampling-paths)
     - [Running interactively (Co-Routine API)](#running-interactively-co-routine-api)
+    - [Sampling Paths](#special-alphabets)
     - [Visualizing DFAs](#visualizing-dfas)
 
 <!-- markdown-toc end -->
@@ -140,6 +142,50 @@ assert dfa1.transduce((1,)) == (False,)
 assert dfa1.transduce((1, 1, 1, 1)) == (False, False, False, True)
 ```
 
+## Composition
+
+`DFA` objects can be combined in two ways:
+
+1. (Synchronous) Cascading Composition: Feed outputs of one `DFA` into another.
+
+```python
+mod_5 = DFA(
+    start=0,
+    label=lambda s: s,
+    transition=lambda s, c: (s + c) % 5,
+    inputs={0, 1},
+    outputs={0, 1, 2, 3, 4},
+)
+eq_0 = DFA(
+    start=0,
+    label=lambda s: s == 0,
+    transition=lambda s, c: c,
+    inputs={0, 1, 2, 3, 4},
+    outputs={True, False}
+)
+
+eq_0_mod_5 = eq_0 << mod_5
+assert eq_0_mod_5.label([0, 0, 0, 0])
+assert not eq_0_mod_5.label([0, 1, 0, 0, 0])
+```
+
+2. (Synchronous) Parallel Composition: Run two `DFA`s in parallel.
+
+```python
+parity = DFA(
+    start=0, inputs={0, 1}, label=lambda s: s,
+    transition=lambda s, c: (s + c) & 1,
+)
+
+self_composed = parity | parity
+
+assert self_composed.label([(0, 0), (1, 0)]) == (1, 0)
+```
+
+**Note** Parallel composition results in a `DFA` with
+`dfa.ProductAlphabet` input and outputs.
+
+
 ## DFA <-> Dictionary
 
 Note that `dfa` provides helper functions for going from a dictionary
@@ -219,6 +265,20 @@ while state != start:
     count += 1
     state = machine.send(1)
 ```
+
+## Special Alphabets
+
+Often times, explicitly representing an alphabet is tedious,
+impossible, or inefficient. 
+
+As such, `dfa` currently provides the following special symbolic
+alphabets (with more planned in the future).
+
+1. `dfa.SupAlphabet`: Alphabet that contains all possible inputs
+   (beware of [Russell's paradox}(https://en.wikipedia.org/wiki/Russell's_paradox)).
+1. `dfa.ProductAlphabet(left, right)`: Alphabet representing the Cartesian product
+   of `left` and `right` alphabets.
+
 
 ## Visualizing DFAs
 
