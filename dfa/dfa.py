@@ -2,10 +2,18 @@ from __future__ import annotations
 
 from functools import total_ordering
 from itertools import product
-from typing import Hashable, FrozenSet, Callable, Optional, Union
+from typing import Hashable, FrozenSet, Callable, Union
 
 import attr
 import funcy as fn
+
+
+def _freeze(alphabet):
+    if alphabet is None or isinstance(alphabet, SupAlphabet):
+        return SupAlphabet()
+    elif isinstance(alphabet, ProductAlphabet):
+        return alphabet
+    return frozenset(alphabet)
 
 
 @attr.s(frozen=True, auto_attribs=True, eq=False)
@@ -29,8 +37,8 @@ class SupAlphabet:
 @total_ordering
 class ProductAlphabet:
     """Implicit encoding of product alphabet."""
-    left: Alphabet
-    right: Alphabet
+    left: Alphabet = attr.ib(converter=_freeze)
+    right: Alphabet = attr.ib(converter=_freeze)
 
     def __hash__(self):
         return hash((self.left, self.right))
@@ -62,14 +70,6 @@ class ProductAlphabet:
 State = Hashable
 Letter = Hashable
 Alphabet = Union[FrozenSet[Letter], ProductAlphabet, SupAlphabet]
-
-
-def _freeze(alphabet: Optional[Alphabet] = None):
-    if alphabet is None or isinstance(alphabet, SupAlphabet):
-        return SupAlphabet()
-    elif isinstance(alphabet, ProductAlphabet):
-        return alphabet
-    return frozenset(alphabet)
 
 
 @attr.s(frozen=True, auto_attribs=True)
