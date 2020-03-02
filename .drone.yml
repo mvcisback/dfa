@@ -12,3 +12,7 @@ steps:
   - poetry install
   - poetry run pytest --flake8 --cov=dfa
   - poetry run codecov
+
+trigger:
+  event:
+    exclude: [ promote ]
