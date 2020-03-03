@@ -170,6 +170,15 @@ assert eq_0_mod_5.label([0, 0, 0, 0])
 assert not eq_0_mod_5.label([0, 1, 0, 0, 0])
 ```
 
+Note that we use Moore Machine semantics (as opposed to Mealy).  Thus
+`eq_0`'s input is determined by `mod_5`'s state *before* seeing the
+input. Thus, the following holds.
+
+```python
+assert not eq_0_mod_5.label([1, 1, 1, 1, 1])
+assert eq_0_mod_5.label([1, 1, 1, 1, 1, 0])
+```
+
 2. (Synchronous) Parallel Composition: Run two `DFA`s in parallel.
 
 ```python

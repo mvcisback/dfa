@@ -127,5 +127,6 @@ def test_seq_composition():
     assert eq_0_mod_5.inputs == {0, 1}
     assert eq_0_mod_5.outputs == {True, False}
     assert eq_0_mod_5.label([0, 0, 0, 0])
-    assert eq_0_mod_5.label([1, 1, 1, 1, 1])
+    assert eq_0_mod_5.label([1, 1, 1, 1, 1, 0])
+    assert not eq_0_mod_5.label([1, 1, 1, 1, 1])
     assert not eq_0_mod_5.label([0, 1, 0, 0, 0])
