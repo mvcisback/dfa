@@ -38,3 +38,15 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
     paths_ = tree.iddfs(max_depth=max_length, randomize=randomize)
 
     return (word for word, path in paths_ if end is None or path[-1] == end)
+
+
+def empty(inputs=None) -> DFA:
+    """Constructs DFA for the empty language."""
+    false = fn.constantly(False)
+    return DFA(start=False, label=false, transition=false, inputs=inputs)
+
+
+def universal(inputs=None) -> DFA:
+    """Constructs DFA for the universal language."""
+    true = fn.constantly(True)
+    return DFA(start=True, label=true, transition=true, inputs=inputs)

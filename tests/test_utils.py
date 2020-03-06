@@ -1,5 +1,5 @@
 import dfa
-from dfa.utils import dict2dfa, dfa2dict, paths
+from dfa.utils import dict2dfa, dfa2dict, paths, universal, empty
 
 
 def test_dict2dfa():
@@ -24,3 +24,8 @@ def test_paths():
 
     for word in access_strings:
         assert dfa_.transition(word, start=0) == 1
+
+
+def test_universal_and_empty():
+    assert universal().label([1, 2, 3, 4])
+    assert not empty().label([1, 2, 3, 4])
