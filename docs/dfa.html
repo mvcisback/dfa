@@ -186,8 +186,10 @@ class DFA:
 
         def transition(composite_state, left_input):
             left, right = composite_state
+            right_input = self._label(left)
+
             left2 = self._transition(left, left_input)
-            right2 = other._transition(right, self._label(left2))
+            right2 = other._transition(right, right_input)
             return (left2, right2)
 
         return DFA(
@@ -308,8 +310,10 @@ class DFA:
 
         def transition(composite_state, left_input):
             left, right = composite_state
+            right_input = self._label(left)
+
             left2 = self._transition(left, left_input)
-            right2 = other._transition(right, self._label(left2))
+            right2 = other._transition(right, right_input)
             return (left2, right2)
 
         return DFA(

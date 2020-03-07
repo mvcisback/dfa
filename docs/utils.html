@@ -27,7 +27,7 @@
 <pre><code class="python">import funcy as fn
 from lazytree import LazyTree
 
-from dfa import DFA
+from dfa import DFA, ProductAlphabet
 
 
 def dfa2dict(dfa_):
@@ -63,7 +63,39 @@ def paths(dfa_, start, end=None, *, max_length=float(&#39;inf&#39;), randomize=F
     tree = LazyTree(root=((), (dfa_.start,)), child_map=child_map)
     paths_ = tree.iddfs(max_depth=max_length, randomize=randomize)
 
-    return (word for word, path in paths_ if end is None or path[-1] == end)</code></pre>
+    return (word for word, path in paths_ if end is None or path[-1] == end)
+
+
+def empty(inputs=None) -&gt; DFA:
+    &#34;&#34;&#34;Constructs DFA for the empty language.&#34;&#34;&#34;
+    false = fn.constantly(False)
+    return DFA(start=False, label=false, transition=false, inputs=inputs)
+
+
+def universal(inputs=None) -&gt; DFA:
+    &#34;&#34;&#34;Constructs DFA for the universal language.&#34;&#34;&#34;
+    true = fn.constantly(True)
+    return DFA(start=True, label=true, transition=true, inputs=inputs)
+
+
+def tee(left: DFA, right: DFA) -&gt; DFA:
+    if left.inputs &lt;= right.inputs:
+        inputs = left.inputs
+    elif right.inputs &lt;= left.inputs:
+        inputs = right.inputs
+    else:
+        raise RuntimeError(&#34;Inputs need to be compatible&#34;)
+
+    def transition(s, c):
+        return left._transition(s[0], c), right._transition(s[1], c)
+
+    return DFA(
+        start=(left.start, right.start),
+        inputs=inputs,
+        transition=transition,
+        label=lambda s: (left._label(s[0]), right._label(s[1])),
+        outputs=ProductAlphabet(left.outputs, right.outputs),
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -109,6 +141,21 @@ def paths(dfa_, start, end=None, *, max_length=float(&#39;inf&#39;), randomize=F
     )</code></pre>
 </details>
 </dd>
+<dt id="dfa.utils.empty"><code class="name flex">
+<span>def <span class="ident">empty</span></span>(<span>inputs=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Constructs DFA for the empty language.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def empty(inputs=None) -&gt; DFA:
+    &#34;&#34;&#34;Constructs DFA for the empty language.&#34;&#34;&#34;
+    false = fn.constantly(False)
+    return DFA(start=False, label=false, transition=false, inputs=inputs)</code></pre>
+</details>
+</dd>
 <dt id="dfa.utils.paths"><code class="name flex">
 <span>def <span class="ident">paths</span></span>(<span>dfa_, start, end=None, *, max_length=inf, randomize=False)</span>
 </code></dt>
@@ -136,6 +183,50 @@ def paths(dfa_, start, end=None, *, max_length=float(&#39;inf&#39;), randomize=F
     return (word for word, path in paths_ if end is None or path[-1] == end)</code></pre>
 </details>
 </dd>
+<dt id="dfa.utils.tee"><code class="name flex">
+<span>def <span class="ident">tee</span></span>(<span>left, right)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tee(left: DFA, right: DFA) -&gt; DFA:
+    if left.inputs &lt;= right.inputs:
+        inputs = left.inputs
+    elif right.inputs &lt;= left.inputs:
+        inputs = right.inputs
+    else:
+        raise RuntimeError(&#34;Inputs need to be compatible&#34;)
+
+    def transition(s, c):
+        return left._transition(s[0], c), right._transition(s[1], c)
+
+    return DFA(
+        start=(left.start, right.start),
+        inputs=inputs,
+        transition=transition,
+        label=lambda s: (left._label(s[0]), right._label(s[1])),
+        outputs=ProductAlphabet(left.outputs, right.outputs),
+    )</code></pre>
+</details>
+</dd>
+<dt id="dfa.utils.universal"><code class="name flex">
+<span>def <span class="ident">universal</span></span>(<span>inputs=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Constructs DFA for the universal language.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def universal(inputs=None) -&gt; DFA:
+    &#34;&#34;&#34;Constructs DFA for the universal language.&#34;&#34;&#34;
+    true = fn.constantly(True)
+    return DFA(start=True, label=true, transition=true, inputs=inputs)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -153,10 +244,13 @@ def paths(dfa_, start, end=None, *, max_length=float(&#39;inf&#39;), randomize=F
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="dfa.utils.dfa2dict" href="#dfa.utils.dfa2dict">dfa2dict</a></code></li>
 <li><code><a title="dfa.utils.dict2dfa" href="#dfa.utils.dict2dfa">dict2dfa</a></code></li>
+<li><code><a title="dfa.utils.empty" href="#dfa.utils.empty">empty</a></code></li>
 <li><code><a title="dfa.utils.paths" href="#dfa.utils.paths">paths</a></code></li>
+<li><code><a title="dfa.utils.tee" href="#dfa.utils.tee">tee</a></code></li>
+<li><code><a title="dfa.utils.universal" href="#dfa.utils.universal">universal</a></code></li>
 </ul>
 </li>
 </ul>
