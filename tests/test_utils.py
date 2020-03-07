@@ -1,5 +1,6 @@
 import dfa
 from dfa.utils import dict2dfa, dfa2dict, paths, universal, empty
+from dfa.utils import tee
 
 
 def test_dict2dfa():
@@ -29,3 +30,10 @@ def test_paths():
 def test_universal_and_empty():
     assert universal().label([1, 2, 3, 4])
     assert not empty().label([1, 2, 3, 4])
+
+
+def test_tee():
+    machine = tee(universal({True}), empty({True, False}))
+    assert machine.inputs == {True}
+    assert machine.label([True, True, True, True]) == (True, False)
+    assert len(machine.states()) == 1

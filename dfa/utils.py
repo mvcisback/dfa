@@ -1,7 +1,7 @@
 import funcy as fn
 from lazytree import LazyTree
 
-from dfa import DFA
+from dfa import DFA, ProductAlphabet
 
 
 def dfa2dict(dfa_):
@@ -50,3 +50,23 @@ def universal(inputs=None) -> DFA:
     """Constructs DFA for the universal language."""
     true = fn.constantly(True)
     return DFA(start=True, label=true, transition=true, inputs=inputs)
+
+
+def tee(left: DFA, right: DFA) -> DFA:
+    if left.inputs <= right.inputs:
+        inputs = left.inputs
+    elif right.inputs <= left.inputs:
+        inputs = right.inputs
+    else:
+        raise RuntimeError("Inputs need to be compatible")
+
+    def transition(s, c):
+        return left._transition(s[0], c), right._transition(s[1], c)
+
+    return DFA(
+        start=(left.start, right.start),
+        inputs=inputs,
+        transition=transition,
+        label=lambda s: (left._label(s[0]), right._label(s[1])),
+        outputs=ProductAlphabet(left.outputs, right.outputs),
+    )
