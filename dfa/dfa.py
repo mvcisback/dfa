@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Hashable, Callable
+from typing import Callable, Hashable
 
 import attr
 import funcy as fn
@@ -26,27 +26,27 @@ class DFA:
     inputs: Alphabet = attr.ib(converter=_freeze, default=SupAlphabet())
     outputs: Alphabet = attr.ib(converter=_freeze, default={True, False})
 
-    def run(self, *, start=None):
+    def run(self, *, start=None, label=False):
         """Creates a co-routine that simulates the automata:
             - Takes in characters from the input alphabet.
             - Yields states.
         """
         state = self.start if start is None else start
+        labeler = self._label if label else lambda x: x
 
         while True:
-            char = yield state
+            char = yield labeler(state)
             assert (self.inputs is None) or (char in self.inputs)
             state = self._transition(state, char)
 
-    def trace(self, word, *, start=None):
+    def trace(self, word, *, start=None, label=False):
         """Creates a generator that yields the sequence of states that
         results from reading the word.
         """
-        machine = self.run(start=start)
+        machine = self.run(start=start, label=label)
 
         for char in fn.concat([None], word):
-            state = machine.send(char)
-            yield state
+            yield machine.send(char)
 
     def transition(self, word, *, start=None):
         """Returns the state the input word accesses."""
@@ -54,13 +54,13 @@ class DFA:
 
     def label(self, word, *, start=None):
         """Returns the label of the input word."""
-        output = self._label(self.transition(word, start=start))
+        output = fn.last(self.trace(word, start=start, label=True))
         assert (self.outputs is None) or (output in self.outputs)
         return output
 
     def transduce(self, word, *, start=None):
         """Returns the labels of the states traced by the input word."""
-        return tuple(map(self._label, self.trace(word, start=start)))[:-1]
+        return tuple(self.trace(word, start=start, label=True))[:-1]
 
     @fn.memoize()
     def states(self):

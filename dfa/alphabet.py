@@ -17,38 +17,41 @@ def _freeze(alphabet):
     return frozenset(alphabet)
 
 
-@attr.s(frozen=True, auto_attribs=True, eq=False)
+def _lt_alphabet(left: Alphabet, right: Alphabet) -> bool:
+    """Return if left is a strict subset of right."""
+    if isinstance(left, SupAlphabet):
+        return False
+    elif isinstance(right, SupAlphabet):
+        return True
+    elif all(isinstance(x, ProductAlphabet) for x in [left, right]):
+        return (left.left < right.left) and (left.right < right.right)
+    return set(left) < set(right)
+
+
+@attr.s(frozen=True, auto_attribs=True, order=False)
 @total_ordering
 class SupAlphabet:
     """Alphabet containing all other alphabets."""
+    __lt__ = _lt_alphabet
+
     def __hash__(self):
         return hash(id(self))
 
     def __contains__(self, _):
         return True
 
-    def __lt__(self, other):
-        return False
 
-    def __eq__(self, other):
-        return isinstance(other, SupAlphabet)
-
-
-@attr.s(frozen=True, auto_attribs=True, repr=False, eq=False)
+@attr.s(frozen=True, auto_attribs=True, repr=False, order=False)
 @total_ordering
 class ProductAlphabet:
     """Implicit encoding of product alphabet."""
     left: Alphabet = attr.ib(converter=_freeze)
     right: Alphabet = attr.ib(converter=_freeze)
 
+    __lt__ = _lt_alphabet
+
     def __hash__(self):
         return hash((self.left, self.right))
-
-    def __eq__(self, other):
-        return (self.left == other.left) and (self.right == other.right)
-
-    def __lt__(self, other):
-        return (self.left < other.left) and (self.right < other.right)
 
     def __contains__(self, elem):
         assert len(elem) == 2
