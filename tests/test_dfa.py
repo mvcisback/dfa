@@ -4,7 +4,8 @@ import pytest
 import hypothesis.strategies as st
 from hypothesis import given
 
-from dfa import DFA, SupAlphabet, ProductAlphabet, ExponentialAlphabet
+from dfa import DFA, SupAlphabet, ProductAlphabet
+from dfa.alphabet import ExplicitAlphabet, ExponentialAlphabet
 
 
 @given(st.lists(st.booleans()))
@@ -75,6 +76,10 @@ def test_sup_alphabet():
 
     assert not ({0, 1} >= alphabet)
     assert not (alphabet <= {0, 1})
+
+
+def test_explicit_alphabet_repr():
+    assert repr(ExplicitAlphabet({0, 1})) == "{0, 1}"
 
 
 def test_exponential_alphabet():
