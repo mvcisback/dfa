@@ -12,9 +12,9 @@ Letter = Hashable
 def _freeze(alphabet):
     if alphabet is None or isinstance(alphabet, SupAlphabet):
         return SupAlphabet()
-    elif isinstance(alphabet, ProductAlphabet):
+    elif isinstance(alphabet, (ProductAlphabet, ExplicitAlphabet)):
         return alphabet
-    return frozenset(alphabet)
+    return ExplicitAlphabet(alphabet)
 
 
 def _lt_alphabet(left: Alphabet, right: Alphabet) -> bool:
@@ -71,4 +71,29 @@ class ProductAlphabet:
         return len(self.left) * len(self.right)
 
 
-Alphabet = Union[FrozenSet[Letter], ProductAlphabet, SupAlphabet]
+@attr.s(frozen=True, auto_attribs=True, eq=False)
+@total_ordering
+class ExplicitAlphabet:
+    chars: FrozenSet[Letter] = attr.ib(converter=frozenset)
+
+    __lt__ = _lt_alphabet
+
+    def __hash__(self):
+        return hash(self.chars)
+
+    def __eq__(self, other):
+        if isinstance(other, ExplicitAlphabet):
+            return self.chars == other.chars
+        return set(self) == set(other)
+
+    def __iter__(self):
+        return iter(self.chars)
+
+    def __len__(self):
+        return len(self.chars)
+
+    def __contains__(self, elem):
+        return elem in self.chars
+
+
+Alphabet = Union[ExplicitAlphabet, ProductAlphabet, SupAlphabet]
