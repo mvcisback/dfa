@@ -145,7 +145,7 @@ assert dfa1.transduce((1, 1, 1, 1)) == (False, False, False, True)
 
 ## Composition
 
-`DFA` objects can be combined in two ways:
+`DFA` objects can be combined in three ways:
 
 1. (Synchronous) Cascading Composition: Feed outputs of one `DFA` into another.
 
@@ -195,6 +195,15 @@ assert self_composed.label([(0, 0), (1, 0)]) == (1, 0)
 **Note** Parallel composition results in a `DFA` with
 `dfa.ProductAlphabet` input and outputs.
 
+3. (Synchronous) Parallel Composition with shared inputs:
+
+```python
+from dfa.utils import tee
+
+self_composed2 = parity | parity
+
+assert self_composed2.label([0, 1, 0]) == (1, 1)
+```
 
 ## DFA <-> Dictionary
 
@@ -281,13 +290,16 @@ while state != start:
 Often times, explicitly representing an alphabet is tedious,
 impossible, or inefficient. 
 
-As such, `dfa` currently provides the following special symbolic
-alphabets (with more planned in the future).
+As such, `dfa` currently provides the following alphabets (with more
+planned in the future).
 
+1. `dfa.ExplicitAlphabet`: A wrapper around frozensets. Default type of `Alphabet`.
 1. `dfa.SupAlphabet`: Alphabet that contains all possible inputs
    (beware of [Russell's paradox}(https://en.wikipedia.org/wiki/Russell's_paradox)).
 1. `dfa.ProductAlphabet(left, right)`: Alphabet representing the Cartesian product
    of `left` and `right` alphabets.
+1. `dfa.ExponentialAlphabet`: Alphabet representing the product of a
+   `base` alphabet with itself `dim` times.
 
 
 ## Visualizing DFAs
