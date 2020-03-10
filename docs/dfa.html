@@ -26,76 +26,16 @@
 </summary>
 <pre><code class="python">from __future__ import annotations
 
-from functools import total_ordering
-from itertools import product
-from typing import Hashable, FrozenSet, Callable, Union
+from typing import Callable, Hashable
 
 import attr
 import funcy as fn
 
-
-def _freeze(alphabet):
-    if alphabet is None or isinstance(alphabet, SupAlphabet):
-        return SupAlphabet()
-    elif isinstance(alphabet, ProductAlphabet):
-        return alphabet
-    return frozenset(alphabet)
-
-
-@attr.s(frozen=True, auto_attribs=True, eq=False)
-@total_ordering
-class SupAlphabet:
-    &#34;&#34;&#34;Alphabet containing all other alphabets.&#34;&#34;&#34;
-    def __hash__(self):
-        return hash(id(self))
-
-    def __contains__(self, _):
-        return True
-
-    def __lt__(self, other):
-        return False
-
-    def __eq__(self, other):
-        return isinstance(other, SupAlphabet)
-
-
-@attr.s(frozen=True, auto_attribs=True, repr=False, eq=False)
-@total_ordering
-class ProductAlphabet:
-    &#34;&#34;&#34;Implicit encoding of product alphabet.&#34;&#34;&#34;
-    left: Alphabet = attr.ib(converter=_freeze)
-    right: Alphabet = attr.ib(converter=_freeze)
-
-    def __hash__(self):
-        return hash((self.left, self.right))
-
-    def __eq__(self, other):
-        return (self.left == other.left) and (self.right == other.right)
-
-    def __lt__(self, other):
-        return (self.left &lt; other.left) and (self.right &lt; other.right)
-
-    def __contains__(self, elem):
-        assert len(elem) == 2
-        return (elem[0] in self.left) and (elem[1] in self.right)
-
-    def __iter__(self):
-        return product(self.left, self.right)
-
-    def __repr__(self):
-        left, right = map(
-            lambda x: x if isinstance(x, SupAlphabet) else set(x),
-            [self.left, self.right]
-        )
-        return f&#34;{left} x {right}&#34;
-
-    def __len__(self):
-        return len(self.left) * len(self.right)
+from dfa.alphabet import Letter, Alphabet, ProductAlphabet, SupAlphabet
+from dfa.alphabet import _freeze
 
 
 State = Hashable
-Letter = Hashable
-Alphabet = Union[FrozenSet[Letter], ProductAlphabet, SupAlphabet]
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -112,27 +52,27 @@ class DFA:
     inputs: Alphabet = attr.ib(converter=_freeze, default=SupAlphabet())
     outputs: Alphabet = attr.ib(converter=_freeze, default={True, False})
 
-    def run(self, *, start=None):
+    def run(self, *, start=None, label=False):
         &#34;&#34;&#34;Creates a co-routine that simulates the automata:
             - Takes in characters from the input alphabet.
             - Yields states.
         &#34;&#34;&#34;
         state = self.start if start is None else start
+        labeler = self._label if label else lambda x: x
 
         while True:
-            char = yield state
+            char = yield labeler(state)
             assert (self.inputs is None) or (char in self.inputs)
             state = self._transition(state, char)
 
-    def trace(self, word, *, start=None):
+    def trace(self, word, *, start=None, label=False):
         &#34;&#34;&#34;Creates a generator that yields the sequence of states that
         results from reading the word.
         &#34;&#34;&#34;
-        machine = self.run(start=start)
+        machine = self.run(start=start, label=label)
 
         for char in fn.concat([None], word):
-            state = machine.send(char)
-            yield state
+            yield machine.send(char)
 
     def transition(self, word, *, start=None):
         &#34;&#34;&#34;Returns the state the input word accesses.&#34;&#34;&#34;
@@ -140,13 +80,13 @@ class DFA:
 
     def label(self, word, *, start=None):
         &#34;&#34;&#34;Returns the label of the input word.&#34;&#34;&#34;
-        output = self._label(self.transition(word, start=start))
+        output = fn.last(self.trace(word, start=start, label=True))
         assert (self.outputs is None) or (output in self.outputs)
         return output
 
     def transduce(self, word, *, start=None):
         &#34;&#34;&#34;Returns the labels of the states traced by the input word.&#34;&#34;&#34;
-        return tuple(map(self._label, self.trace(word, start=start)))[:-1]
+        return tuple(self.trace(word, start=start, label=True))[:-1]
 
     @fn.memoize()
     def states(self):
@@ -236,27 +176,27 @@ class DFA:
     inputs: Alphabet = attr.ib(converter=_freeze, default=SupAlphabet())
     outputs: Alphabet = attr.ib(converter=_freeze, default={True, False})
 
-    def run(self, *, start=None):
+    def run(self, *, start=None, label=False):
         &#34;&#34;&#34;Creates a co-routine that simulates the automata:
             - Takes in characters from the input alphabet.
             - Yields states.
         &#34;&#34;&#34;
         state = self.start if start is None else start
+        labeler = self._label if label else lambda x: x
 
         while True:
-            char = yield state
+            char = yield labeler(state)
             assert (self.inputs is None) or (char in self.inputs)
             state = self._transition(state, char)
 
-    def trace(self, word, *, start=None):
+    def trace(self, word, *, start=None, label=False):
         &#34;&#34;&#34;Creates a generator that yields the sequence of states that
         results from reading the word.
         &#34;&#34;&#34;
-        machine = self.run(start=start)
+        machine = self.run(start=start, label=label)
 
         for char in fn.concat([None], word):
-            state = machine.send(char)
-            yield state
+            yield machine.send(char)
 
     def transition(self, word, *, start=None):
         &#34;&#34;&#34;Returns the state the input word accesses.&#34;&#34;&#34;
@@ -264,13 +204,13 @@ class DFA:
 
     def label(self, word, *, start=None):
         &#34;&#34;&#34;Returns the label of the input word.&#34;&#34;&#34;
-        output = self._label(self.transition(word, start=start))
+        output = fn.last(self.trace(word, start=start, label=True))
         assert (self.outputs is None) or (output in self.outputs)
         return output
 
     def transduce(self, word, *, start=None):
         &#34;&#34;&#34;Returns the labels of the states traced by the input word.&#34;&#34;&#34;
-        return tuple(map(self._label, self.trace(word, start=start)))[:-1]
+        return tuple(self.trace(word, start=start, label=True))[:-1]
 
     @fn.memoize()
     def states(self):
@@ -340,13 +280,13 @@ class DFA:
 </summary>
 <pre><code class="python">def label(self, word, *, start=None):
     &#34;&#34;&#34;Returns the label of the input word.&#34;&#34;&#34;
-    output = self._label(self.transition(word, start=start))
+    output = fn.last(self.trace(word, start=start, label=True))
     assert (self.outputs is None) or (output in self.outputs)
     return output</code></pre>
 </details>
 </dd>
 <dt id="dfa.dfa.DFA.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>self, *, start=None)</span>
+<span>def <span class="ident">run</span></span>(<span>self, *, start=None, label=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Creates a co-routine that simulates the automata:
@@ -356,15 +296,16 @@ class DFA:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def run(self, *, start=None):
+<pre><code class="python">def run(self, *, start=None, label=False):
     &#34;&#34;&#34;Creates a co-routine that simulates the automata:
         - Takes in characters from the input alphabet.
         - Yields states.
     &#34;&#34;&#34;
     state = self.start if start is None else start
+    labeler = self._label if label else lambda x: x
 
     while True:
-        char = yield state
+        char = yield labeler(state)
         assert (self.inputs is None) or (char in self.inputs)
         state = self._transition(state, char)</code></pre>
 </details>
@@ -399,7 +340,7 @@ def states(self):
 </details>
 </dd>
 <dt id="dfa.dfa.DFA.trace"><code class="name flex">
-<span>def <span class="ident">trace</span></span>(<span>self, word, *, start=None)</span>
+<span>def <span class="ident">trace</span></span>(<span>self, word, *, start=None, label=False)</span>
 </code></dt>
 <dd>
 <section class="desc"><p>Creates a generator that yields the sequence of states that
@@ -408,15 +349,14 @@ results from reading the word.</p></section>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def trace(self, word, *, start=None):
+<pre><code class="python">def trace(self, word, *, start=None, label=False):
     &#34;&#34;&#34;Creates a generator that yields the sequence of states that
     results from reading the word.
     &#34;&#34;&#34;
-    machine = self.run(start=start)
+    machine = self.run(start=start, label=label)
 
     for char in fn.concat([None], word):
-        state = machine.send(char)
-        yield state</code></pre>
+        yield machine.send(char)</code></pre>
 </details>
 </dd>
 <dt id="dfa.dfa.DFA.transduce"><code class="name flex">
@@ -430,7 +370,7 @@ results from reading the word.</p></section>
 </summary>
 <pre><code class="python">def transduce(self, word, *, start=None):
     &#34;&#34;&#34;Returns the labels of the states traced by the input word.&#34;&#34;&#34;
-    return tuple(map(self._label, self.trace(word, start=start)))[:-1]</code></pre>
+    return tuple(self.trace(word, start=start, label=True))[:-1]</code></pre>
 </details>
 </dd>
 <dt id="dfa.dfa.DFA.transition"><code class="name flex">
@@ -448,72 +388,6 @@ results from reading the word.</p></section>
 </details>
 </dd>
 </dl>
-</dd>
-<dt id="dfa.dfa.ProductAlphabet"><code class="flex name class">
-<span>class <span class="ident">ProductAlphabet</span></span>
-<span>(</span><span>left, right)</span>
-</code></dt>
-<dd>
-<section class="desc"><p>Implicit encoding of product alphabet.</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class ProductAlphabet:
-    &#34;&#34;&#34;Implicit encoding of product alphabet.&#34;&#34;&#34;
-    left: Alphabet = attr.ib(converter=_freeze)
-    right: Alphabet = attr.ib(converter=_freeze)
-
-    def __hash__(self):
-        return hash((self.left, self.right))
-
-    def __eq__(self, other):
-        return (self.left == other.left) and (self.right == other.right)
-
-    def __lt__(self, other):
-        return (self.left &lt; other.left) and (self.right &lt; other.right)
-
-    def __contains__(self, elem):
-        assert len(elem) == 2
-        return (elem[0] in self.left) and (elem[1] in self.right)
-
-    def __iter__(self):
-        return product(self.left, self.right)
-
-    def __repr__(self):
-        left, right = map(
-            lambda x: x if isinstance(x, SupAlphabet) else set(x),
-            [self.left, self.right]
-        )
-        return f&#34;{left} x {right}&#34;
-
-    def __len__(self):
-        return len(self.left) * len(self.right)</code></pre>
-</details>
-</dd>
-<dt id="dfa.dfa.SupAlphabet"><code class="flex name class">
-<span>class <span class="ident">SupAlphabet</span></span>
-</code></dt>
-<dd>
-<section class="desc"><p>Alphabet containing all other alphabets.</p></section>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class SupAlphabet:
-    &#34;&#34;&#34;Alphabet containing all other alphabets.&#34;&#34;&#34;
-    def __hash__(self):
-        return hash(id(self))
-
-    def __contains__(self, _):
-        return True
-
-    def __lt__(self, other):
-        return False
-
-    def __eq__(self, other):
-        return isinstance(other, SupAlphabet)</code></pre>
-</details>
 </dd>
 </dl>
 </section>
@@ -541,12 +415,6 @@ results from reading the word.</p></section>
 <li><code><a title="dfa.dfa.DFA.transduce" href="#dfa.dfa.DFA.transduce">transduce</a></code></li>
 <li><code><a title="dfa.dfa.DFA.transition" href="#dfa.dfa.DFA.transition">transition</a></code></li>
 </ul>
-</li>
-<li>
-<h4><code><a title="dfa.dfa.ProductAlphabet" href="#dfa.dfa.ProductAlphabet">ProductAlphabet</a></code></h4>
-</li>
-<li>
-<h4><code><a title="dfa.dfa.SupAlphabet" href="#dfa.dfa.SupAlphabet">SupAlphabet</a></code></h4>
 </li>
 </ul>
 </li>
