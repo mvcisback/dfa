@@ -36,7 +36,7 @@ def _freeze(alphabet):
 Letter = Hashable
 
 
-@attr.s(frozen=True, auto_attribs=True, eq=False)
+@attr.s(frozen=True, auto_attribs=True, eq=False, repr=False)
 @total_ordering
 class ExplicitAlphabet:
     """Alphabet defined by a set."""
@@ -60,6 +60,9 @@ class ExplicitAlphabet:
 
     def __contains__(self, elem):
         return elem in self.chars
+
+    def __repr__(self):
+        return repr(set(self.chars))
 
 
 @attr.s(frozen=True, auto_attribs=True, order=False)
@@ -125,13 +128,16 @@ class ExponentialAlphabet:
         for i, e in enumerate(elem):         # Allowing elem to be a generator.
             if (i >= self.dim) or (e not in self.base):
                 return False
-        return i == self.dim
+        return i + 1 == self.dim
 
     def __repr__(self):
-        return "{self.base} ^ {self.dim}"
+        return f"{self.base}^{self.dim}"
 
     def __len__(self):
         return self.dim * len(self.base)
+
+    def __iter__(self):
+        return product(*(self.dim*[self.base]))
 
 
 Alphabet = Union[

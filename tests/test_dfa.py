@@ -1,9 +1,10 @@
-import pytest
+from itertools import product
 
+import pytest
 import hypothesis.strategies as st
 from hypothesis import given
 
-from dfa import DFA, SupAlphabet, ProductAlphabet
+from dfa import DFA, SupAlphabet, ProductAlphabet, ExponentialAlphabet
 
 
 @given(st.lists(st.booleans()))
@@ -74,6 +75,17 @@ def test_sup_alphabet():
 
     assert not ({0, 1} >= alphabet)
     assert not (alphabet <= {0, 1})
+
+
+def test_exponential_alphabet():
+    alphabet = ExponentialAlphabet(base={0, 1}, dim=3)
+    assert (0, 0, 0) in alphabet
+    assert set(alphabet) == set(product(*(3*[(0, 1)])))
+
+    assert product(*(3*[(1,)])) < alphabet
+    assert ExponentialAlphabet(base={1}, dim=3) < alphabet
+    assert alphabet == alphabet
+    assert repr(alphabet) == "{0, 1}^3"
 
 
 def test_parallel_composition():
