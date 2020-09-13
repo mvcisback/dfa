@@ -24,6 +24,7 @@ pytest-cov = "^2.7"
 pytest-flake8 = "^1.0"
 pytest-sugar = "^0.9.2"
 codecov = "^2.0"
+pdoc3 = "^0.9.1"
 
 [tool.poetry.extras]
 draw = ["pydot"]
