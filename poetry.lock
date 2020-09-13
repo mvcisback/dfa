@@ -1,5 +1,5 @@
 [[package]]
-category = "dev"
+category = "main"
 description = "apipkg: namespace control and lazy-import mechanism"
 name = "apipkg"
 optional = false
@@ -7,8 +7,9 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.5"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Atomic file writes."
+marker = "sys_platform == \"win32\""
 name = "atomicwrites"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -57,9 +58,9 @@ coverage = "*"
 requests = ">=2.7.9"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Cross-platform colored terminal text."
-marker = "sys_platform == \"win32\" and python_version != \"3.4\""
+marker = "sys_platform == \"win32\""
 name = "colorama"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
@@ -77,7 +78,7 @@ version = "5.2.1"
 toml = ["toml"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "execnet: rapid multi-Python deployment"
 name = "execnet"
 optional = false
@@ -120,18 +121,20 @@ category = "dev"
 description = "A library for property-based testing"
 name = "hypothesis"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "4.57.1"
+python-versions = ">=3.6"
+version = "5.35.0"
 
 [package.dependencies]
 attrs = ">=19.2.0"
 sortedcontainers = ">=2.1.0,<3.0.0"
 
 [package.extras]
-all = ["django (>=1.11)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "numpy (>=1.9.0)", "pandas (>=0.19)", "pytest (>=4.3)", "python-dateutil (>=1.4)", "pytz (>=2014.1)"]
+all = ["black (>=19.10b0)", "click (>=7.0)", "django (>=2.2)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "numpy (>=1.9.0)", "pandas (>=0.19)", "pytest (>=4.3)", "python-dateutil (>=1.4)", "pytz (>=2014.1)"]
+cli = ["click (>=7.0)", "black (>=19.10b0)"]
 dateutil = ["python-dateutil (>=1.4)"]
-django = ["pytz (>=2014.1)", "django (>=1.11)"]
+django = ["pytz (>=2014.1)", "django (>=2.2)"]
 dpcontracts = ["dpcontracts (>=0.4)"]
+ghostwriter = ["black (>=19.10b0)"]
 lark = ["lark-parser (>=0.6.5)"]
 numpy = ["numpy (>=1.9.0)"]
 pandas = ["pandas (>=0.19)"]
@@ -147,7 +150,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.10"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Read metadata from Python packages"
 marker = "python_version < \"3.8\""
 name = "importlib-metadata"
@@ -161,6 +164,14 @@ zipp = ">=0.5"
 [package.extras]
 docs = ["sphinx", "rst.linker"]
 testing = ["packaging", "pep517", "importlib-resources (>=1.3)"]
+
+[[package]]
+category = "main"
+description = "iniconfig: brain-dead simple config-ini parsing"
+name = "iniconfig"
+optional = false
+python-versions = "*"
+version = "1.0.1"
 
 [[package]]
 category = "main"
@@ -183,16 +194,15 @@ python-versions = "*"
 version = "0.6.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "More routines for operating on iterables, beyond itertools"
-marker = "python_version > \"2.7\""
 name = "more-itertools"
 optional = false
 python-versions = ">=3.5"
 version = "8.5.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Core utilities for Python packages"
 name = "packaging"
 optional = false
@@ -215,7 +225,7 @@ version = "0.8.1"
 six = ">=1.9.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "plugin and hook calling mechanisms for python"
 name = "pluggy"
 optional = false
@@ -231,7 +241,7 @@ version = ">=0.12"
 dev = ["pre-commit", "tox"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
 optional = false
@@ -274,36 +284,31 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "2.4.7"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
-version = "4.6.11"
+python-versions = ">=3.5"
+version = "6.0.2"
 
 [package.dependencies]
 atomicwrites = ">=1.0"
 attrs = ">=17.4.0"
+colorama = "*"
+iniconfig = "*"
+more-itertools = ">=4.0.0"
 packaging = "*"
 pluggy = ">=0.12,<1.0"
-py = ">=1.5.0"
-six = ">=1.10.0"
-wcwidth = "*"
-
-[package.dependencies.colorama]
-python = "<3.4.0 || >=3.5.0"
-version = "*"
+py = ">=1.8.2"
+toml = "*"
 
 [package.dependencies.importlib-metadata]
 python = "<3.8"
 version = ">=0.12"
 
-[package.dependencies.more-itertools]
-python = ">=2.8"
-version = ">=4.0.0"
-
 [package.extras]
-testing = ["argcomplete", "hypothesis (>=3.56)", "nose", "requests", "mock"]
+checkqa_mypy = ["mypy (0.780)"]
+testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
 category = "dev"
@@ -333,7 +338,7 @@ flake8 = ">=3.5"
 pytest = ">=3.5"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "run tests in isolated forked subprocesses"
 name = "pytest-forked"
 optional = false
@@ -358,20 +363,20 @@ pytest = ">=2.9"
 termcolor = ">=1.1.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "pytest xdist plugin for distributed testing and loop-on-failing modes"
 name = "pytest-xdist"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "1.34.0"
+python-versions = ">=3.5"
+version = "2.1.0"
 
 [package.dependencies]
 execnet = ">=1.1"
-pytest = ">=4.4.0"
+pytest = ">=6.0.0"
 pytest-forked = "*"
-six = "*"
 
 [package.extras]
+psutil = ["psutil (>=3.0)"]
 testing = ["filelock"]
 
 [[package]]
@@ -393,7 +398,7 @@ security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7)", "win-inet-pton"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -417,6 +422,14 @@ python-versions = "*"
 version = "1.1.0"
 
 [[package]]
+category = "main"
+description = "Python Library for Tom's Obvious, Minimal Language"
+name = "toml"
+optional = false
+python-versions = "*"
+version = "0.10.1"
+
+[[package]]
 category = "dev"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
@@ -430,15 +443,7 @@ secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
 
 [[package]]
-category = "dev"
-description = "Measures the displayed width of unicode strings in a terminal"
-name = "wcwidth"
-optional = false
-python-versions = "*"
-version = "0.2.5"
-
-[[package]]
-category = "dev"
+category = "main"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 marker = "python_version < \"3.8\""
 name = "zipp"
@@ -454,8 +459,8 @@ testing = ["jaraco.itertools", "func-timeout"]
 draw = ["pydot"]
 
 [metadata]
-content-hash = "9522d314fa241d9c5ebb82b4476ea054f42b719e8ad6e21d1833643ff86a1e08"
-python-versions = "^3.6"
+content-hash = "ac627315909118e6baa31f458166b3310c7d441c401079b95f6c4d2ea0cd2311"
+python-versions = "^3.7"
 
 [metadata.files]
 apipkg = [
@@ -535,8 +540,8 @@ funcy = [
     {file = "funcy-1.14.tar.gz", hash = "sha256:75ee84c3b446f92e68a857c2267b15a1b49c631c9d5a87a5f063cd2d6761a5c4"},
 ]
 hypothesis = [
-    {file = "hypothesis-4.57.1-py3-none-any.whl", hash = "sha256:94f0910bc87e0ae8c098f4ada28dfdc381245e0c8079c674292b417dbde144b5"},
-    {file = "hypothesis-4.57.1.tar.gz", hash = "sha256:3c4369a4b0a1348561048bcda5f1db951a1b8e2a514ea8e8c70d36e656bf6fa0"},
+    {file = "hypothesis-5.35.0-py3-none-any.whl", hash = "sha256:546650b62e14baae466bbc0d270de3f8c2f5da0640f476468e7f557a714ad40a"},
+    {file = "hypothesis-5.35.0.tar.gz", hash = "sha256:446f42b0ae7ceb1821f4a57e56bbe2afef98d7ab47ef5159c74c7162385e849f"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -545,6 +550,10 @@ idna = [
 importlib-metadata = [
     {file = "importlib_metadata-1.7.0-py2.py3-none-any.whl", hash = "sha256:dc15b2969b4ce36305c51eebe62d418ac7791e9a157911d58bfb1f9ccd8e2070"},
     {file = "importlib_metadata-1.7.0.tar.gz", hash = "sha256:90bb658cdbbf6d1735b6341ce708fc7024a3e14e99ffdc5783edea9f9b077f83"},
+]
+iniconfig = [
+    {file = "iniconfig-1.0.1-py3-none-any.whl", hash = "sha256:80cf40c597eb564e86346103f609d74efce0f6b4d4f30ec8ce9e2c26411ba437"},
+    {file = "iniconfig-1.0.1.tar.gz", hash = "sha256:e5f92f89355a67de0595932a6c6c02ab4afddc6fcdc0bfc5becd0d60884d3f69"},
 ]
 lazytree = [
     {file = "lazytree-0.3.2-py3-none-any.whl", hash = "sha256:dc11850027ab2d4efa35210f6dd34837a1baf202578ae278e4d1a90f657fb8e4"},
@@ -590,8 +599,8 @@ pyparsing = [
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
 pytest = [
-    {file = "pytest-4.6.11-py2.py3-none-any.whl", hash = "sha256:a00a7d79cbbdfa9d21e7d0298392a8dd4123316bfac545075e6f8f24c94d8c97"},
-    {file = "pytest-4.6.11.tar.gz", hash = "sha256:50fa82392f2120cc3ec2ca0a75ee615be4c479e66669789771f1758332be4353"},
+    {file = "pytest-6.0.2-py3-none-any.whl", hash = "sha256:0e37f61339c4578776e090c3b8f6b16ce4db333889d65d0efb305243ec544b40"},
+    {file = "pytest-6.0.2.tar.gz", hash = "sha256:c8f57c2a30983f469bf03e68cdfa74dc474ce56b8f280ddcb080dfd91df01043"},
 ]
 pytest-cov = [
     {file = "pytest-cov-2.10.1.tar.gz", hash = "sha256:47bd0ce14056fdd79f93e1713f88fad7bdcc583dcd7783da86ef2f085a0bb88e"},
@@ -609,8 +618,8 @@ pytest-sugar = [
     {file = "pytest-sugar-0.9.4.tar.gz", hash = "sha256:b1b2186b0a72aada6859bea2a5764145e3aaa2c1cfbb23c3a19b5f7b697563d3"},
 ]
 pytest-xdist = [
-    {file = "pytest-xdist-1.34.0.tar.gz", hash = "sha256:340e8e83e2a4c0d861bdd8d05c5d7b7143f6eea0aba902997db15c2a86be04ee"},
-    {file = "pytest_xdist-1.34.0-py2.py3-none-any.whl", hash = "sha256:ba5d10729372d65df3ac150872f9df5d2ed004a3b0d499cc0164aafedd8c7b66"},
+    {file = "pytest-xdist-2.1.0.tar.gz", hash = "sha256:82d938f1a24186520e2d9d3a64ef7d9ac7ecdf1a0659e095d18e596b8cbd0672"},
+    {file = "pytest_xdist-2.1.0-py3-none-any.whl", hash = "sha256:7c629016b3bb006b88ac68e2b31551e7becf173c76b977768848e2bbed594d90"},
 ]
 requests = [
     {file = "requests-2.24.0-py2.py3-none-any.whl", hash = "sha256:fe75cc94a9443b9246fc7049224f75604b113c36acb93f87b80ed42c44cbb898"},
@@ -627,13 +636,13 @@ sortedcontainers = [
 termcolor = [
     {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
+toml = [
+    {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
+    {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
+]
 urllib3 = [
     {file = "urllib3-1.25.10-py2.py3-none-any.whl", hash = "sha256:e7983572181f5e1522d9c98453462384ee92a0be7fac5f1413a1e35c56cc0461"},
     {file = "urllib3-1.25.10.tar.gz", hash = "sha256:91056c15fa70756691db97756772bb1eb9678fa585d9184f24534b100dc60f4a"},
-]
-wcwidth = [
-    {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
-    {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
 ]
 zipp = [
     {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
