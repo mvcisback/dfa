@@ -3,6 +3,7 @@
 A simple python implementation of a DFA. 
 
 [![Build Status](https://cloud.drone.io/api/badges/mvcisback/dfa/status.svg)](https://cloud.drone.io/mvcisback/dfa)
+[![Docs](https://img.shields.io/badge/API-link-color)](https://mvcisback.github.io/dfa)
 [![codecov](https://codecov.io/gh/mvcisback/dfa/branch/master/graph/badge.svg)](https://codecov.io/gh/mvcisback/dfa)
 [![PyPI version](https://badge.fury.io/py/dfa.svg)](https://badge.fury.io/py/dfa)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -16,9 +17,11 @@ A simple python implementation of a DFA.
     - [Transitions and Traces](#transitions-and-traces)
     - [Non-boolean output alphabets](#non-boolean-output-alphabets)
     - [Moore Machines](#moore-machines)
+    - [Composition](#composition)
     - [DFA <-> Dictionary](#dfa---dictionary)
     - [Computing Reachable States](#computing-reachable-states)
     - [Sampling Paths](#sampling-paths)
+    - [Running interactively (Co-Routine API)](#running-interactively-co-routine-api)
     - [Visualizing DFAs](#visualizing-dfas)
 
 <!-- markdown-toc end -->
@@ -139,6 +142,68 @@ assert dfa1.transduce((1,)) == (False,)
 assert dfa1.transduce((1, 1, 1, 1)) == (False, False, False, True)
 ```
 
+## Composition
+
+`DFA` objects can be combined in three ways:
+
+1. (Synchronous) Cascading Composition: Feed outputs of one `DFA` into another.
+
+```python
+mod_5 = DFA(
+    start=0,
+    label=lambda s: s,
+    transition=lambda s, c: (s + c) % 5,
+    inputs={0, 1},
+    outputs={0, 1, 2, 3, 4},
+)
+eq_0 = DFA(
+    start=0,
+    label=lambda s: s == 0,
+    transition=lambda s, c: c,
+    inputs={0, 1, 2, 3, 4},
+    outputs={True, False}
+)
+
+eq_0_mod_5 = eq_0 << mod_5
+assert eq_0_mod_5.label([0, 0, 0, 0])
+assert not eq_0_mod_5.label([0, 1, 0, 0, 0])
+```
+
+Note that we use Moore Machine semantics (as opposed to Mealy).  Thus
+`eq_0`'s input is determined by `mod_5`'s state *before* seeing the
+input. Thus, the following holds.
+
+```python
+assert not eq_0_mod_5.label([1, 1, 1, 1, 1])
+assert eq_0_mod_5.label([1, 1, 1, 1, 1, 0])
+```
+
+2. (Synchronous) Parallel Composition: Run two `DFA`s in parallel.
+
+```python
+parity = DFA(
+    start=0, inputs={0, 1}, label=lambda s: s,
+    transition=lambda s, c: (s + c) & 1,
+)
+
+self_composed = parity | parity
+
+assert self_composed.label([(0, 0), (1, 0)]) == (1, 0)
+```
+
+**Note** Parallel composition results in a `DFA` with
+`dfa.ProductAlphabet` input and outputs.
+
+3. (Synchronous) Parallel Composition with shared inputs:
+
+```python
+from dfa.utils import tee
+
+self_composed2 = parity | parity
+
+assert self_composed2.label([0, 1, 0]) == (1, 1)
+```
+
 ## DFA <-> Dictionary
 
 Note that `dfa` provides helper functions for going from a dictionary
@@ -197,6 +262,26 @@ access_strings = paths(
 
 for word in access_strings:
     assert dfa1.transition(word, start=0) == 1
+```
+
+## Running interactively (Co-Routine API)
+
+`dfa` supports interactively stepping through a `DFA` object via
+co-routines. This is particularly useful when using DFA in a control
+loop. For example, the following code counts how many `1`'s it takes
+to advance `dfa1`'s state back to the start state.
+
+```python
+
+machine = dfa1.run()
+
+start = next(machine)
+state = None
+
+count = 0
+while state != start:
+    count += 1
+    state = machine.send(1)
 ```
 
 ## Visualizing DFAs
