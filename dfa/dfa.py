@@ -34,7 +34,7 @@ class DFA:
         """
         labeler = self.dfa._label if label else lambda x: x
 
-        state = start
+        state = self.start if start is None else start
         while True:
             letter = yield labeler(state)
             state = self.transition((letter,), start=state)
