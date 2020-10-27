@@ -37,3 +37,22 @@ def test_example2(word):
     accept = (len(word) == 0) or (word[-1] == "move left")
     assert dfa.label(word) == accept
     assert dfa.states() == {"left", "right"}
+
+
+def test_run_count():
+    count_mod4 = DFA(
+        start=0,
+        inputs={0, 1},
+        outputs={0, 1, 2, 3},
+        label=lambda s: s == 0,
+        transition=lambda s, c: (s + c) % 4
+    )
+    machine = count_mod4.run()
+    next(machine)
+
+    count = 0
+    state = None
+    while state != count_mod4.start:
+        count += 1
+        state = machine.send(1)
+    assert count == 4

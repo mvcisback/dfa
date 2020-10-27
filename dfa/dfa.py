@@ -23,6 +23,22 @@ class DFA:
     )
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
 
+    def run(self, *, start=None, label=False):
+        """Co-routine interface for simulating runs of the automaton.
+
+        - Users can send system actions (elements of self.inputs).
+        - Co-routine yields the current state.
+
+        If label is True, then state labels are returned instead
+        of states.
+        """
+        labeler = self.dfa._label if label else lambda x: x
+
+        state = start
+        while True:
+            letter = yield labeler(state)
+            state = self.transition((letter,), start=state)
+
     def trace(self, word, *, start=None):
         state = self.start if start is None else start
         yield state

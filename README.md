@@ -275,11 +275,11 @@ to advance `dfa1`'s state back to the start state.
 
 machine = dfa1.run()
 
-start = next(machine)
+next(machine)
 state = None
 
 count = 0
-while state != start:
+while state != dfa1.start:
     count += 1
     state = machine.send(1)
 ```
