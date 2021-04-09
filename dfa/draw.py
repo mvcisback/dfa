@@ -18,7 +18,7 @@ def write_dot(dfa_, path):
     for start, (_, transitions) in dfa_dict.items():
         g.add_node(nodes[start])
         for action, end in transitions.items():
-            g.add_edge(pydot.Edge(nodes[start], nodes[end], label=action))
+            g.add_edge(pydot.Edge(nodes[start], nodes[end], label=str(action)))
 
     with open(path, 'w') as f:
         f.write(str(g))
