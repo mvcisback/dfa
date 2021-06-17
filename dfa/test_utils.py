@@ -1,5 +1,5 @@
 import dfa
-from dfa.utils import dict2dfa, dfa2dict, paths
+from dfa.utils import dict2dfa, dfa2dict, paths, check_is_subset, check_equivalence
 
 
 def test_dict2dfa():
@@ -24,3 +24,36 @@ def test_paths():
 
     for word in access_strings:
         assert dfa_.transition(word, start=0) == 1
+
+def test_subset_equivalence():
+    dfa_dict = {
+        0: (False, {0: 0, 1: 1}),
+        1: (False, {0: 1, 1: 2}),
+        2: (False, {0: 2, 1: 3}),
+        3: (True, {0: 3, 1: 0})
+    }
+
+    dfa_dict_super = {
+        0: (False, {0: 0, 1: 1}),
+        1: (False, {0: 1, 1: 2}),
+        2: (False, {0: 2, 1: 3}),
+        3: (True, {0: 4, 1: 0}),
+        4: (True, {0: 4, 1: 5}),
+        5: (True, {0: 0, 1: 1})
+    }
+
+    dfa_dict_equiv = {
+        0: (False, {0: 0, 1: 1}),
+        1: (False, {0: 1, 1: 2}),
+        2: (False, {0: 2, 1: 3}),
+        3: (True, {0: 4, 1: 0}),
+        4: (True, {0: 4, 1: 0}),
+    }
+
+    dfa1 = dict2dfa(dfa_dict, 0)
+    dfa2 = dict2dfa(dfa_dict_super, 0)
+    dfa3 = dict2dfa(dfa_dict_equiv, 0)
+
+    assert check_is_subset(dfa2, dfa1) is None
+    assert check_is_subset(dfa1, dfa2) is not None
+    assert check_equivalence(dfa1, dfa3)

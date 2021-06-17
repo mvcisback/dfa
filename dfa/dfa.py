@@ -76,3 +76,23 @@ class DFA:
             stack.extend(successors)
 
         return visited
+
+    def __invert__(self):
+        if self.outputs != {True, False}:
+            raise ValueError("complement only defined for boolean output DFAs.")
+        return attr.evolve(self, label=lambda s: not self._label(s))
+
+    def __and__(self, other):
+        if (self.outputs != other.outputs) or (self.inputs != other.inputs):
+            raise ValueError("intersection requires common i/o interface.")
+        if self.outputs != {True, False}:
+            raise ValueError("intersect only defined for boolean output DFAs.")
+        return DFA(
+            start=(self.start, other.start),
+            inputs=self.inputs,  # Assumed shared alphabet
+            transition=lambda s, c: (self._transition(s[0], c), other._transition(s[1], c)),
+            label=lambda s: (self._label(s[0]) and other._label(s[1])))
+
+    def __or__(self, other):
+        return ~((~self) & (~other))
+

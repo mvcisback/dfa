@@ -40,32 +40,15 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
     return (word for word, path in paths_ if end is None or path[-1] == end)
 
 def check_equivalence(dfa_a_, dfa_b_):
-    return check_is_subset(dfa_a_, dfa_b_) and check_is_subset(dfa_b_, dfa_a_)
+    return check_is_subset(dfa_a_, dfa_b_) is None and check_is_subset(dfa_b_, dfa_a_) is None
 
 def check_is_subset(dfa_, dfa_subset_candidate_):
     # first, get the complement of the non-candidate DFA
-    dfa_dict, dfa_start = dfa2dict(dfa_)
-    complement_dfa_dict = {state: (not dfa_dict[state][0], dfa_dict[state][1]) for state in dfa_dict}
-    complement_dfa_ = dict2dfa(complement_dfa_dict, dfa_start)
+    dfa12 = (~dfa_) & dfa_subset_candidate_
+    bad_states = (s for s in dfa12.states() if dfa12._label(s))
+    bad_state = next(bad_states, None)
+    if bad_state is None:
+        return None
+    all_paths = paths(dfa12, dfa12.start, end=bad_state)
 
-    # now, get the automata that recognizes the languages of the candidate and the complement
-    candidate_dfa_dict, candidate_dfa_start = dfa2dict(dfa_subset_candidate_)
-
-    intersection_dfa_dict = {}
-    for state_u, (u_label, u_transdict) in complement_dfa_dict.items():
-        for state_v, (v_label, v_transdict) in candidate_dfa_dict.items():
-            joint_transdict = {}
-            joint_label = u_label and v_label
-            for transition_label in u_transdict:
-                if transition_label in v_transdict:
-                    joint_transdict[transition_label] = (u_transdict[transition_label], v_transdict[transition_label])
-            intersection_dfa_dict[(state_u, state_v)] = (joint_label, joint_transdict)
-
-    joint_start_state = (dfa_start, candidate_dfa_start)
-    # lastly, check reachable states. if there is a reachable state, we are not a subset
-    intersect_dfa = dict2dfa(intersection_dfa_dict, joint_start_state)
-    reachable_states = intersect_dfa.states()
-    for reachable_state in reachable_states:
-        if intersection_dfa_dict[reachable_state][0]:
-            return False
-    return True
+    return next(all_paths)
