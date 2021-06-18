@@ -1,5 +1,5 @@
 import dfa
-from dfa.utils import dict2dfa, dfa2dict, paths, check_is_subset, check_equivalence
+from dfa.utils import dict2dfa, dfa2dict, paths, find_subset_counterexample, find_equiv_counterexample
 
 
 def test_dict2dfa():
@@ -54,6 +54,6 @@ def test_subset_equivalence():
     dfa2 = dict2dfa(dfa_dict_super, 0)
     dfa3 = dict2dfa(dfa_dict_equiv, 0)
 
-    assert check_is_subset(dfa2, dfa1) is None
-    assert check_is_subset(dfa1, dfa2) is not None
-    assert check_equivalence(dfa1, dfa3)
+    assert find_subset_counterexample(dfa1, dfa2) is None
+    assert find_subset_counterexample(dfa2, dfa1) is not None
+    assert find_equiv_counterexample(dfa1, dfa3) is None

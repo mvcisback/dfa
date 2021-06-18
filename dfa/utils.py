@@ -39,16 +39,23 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
 
     return (word for word, path in paths_ if end is None or path[-1] == end)
 
-def check_equivalence(dfa_a_, dfa_b_):
-    return check_is_subset(dfa_a_, dfa_b_) is None and check_is_subset(dfa_b_, dfa_a_) is None
+def find_equiv_counterexample(dfa_a, dfa_b):
+    """
+    Returns None if DFAs are equivalent; if not, returns a counterexample.
+    """
+    return find_subset_counterexample(dfa_b, dfa_a) if find_subset_counterexample(dfa_a, dfa_b) is None \
+        else find_subset_counterexample(dfa_a, dfa_b)
 
-def check_is_subset(dfa_, dfa_subset_candidate_):
+def find_subset_counterexample(smaller, bigger):
+    """
+    Returns None if dfa_subset_candidate is a subset of dfa; if not, returns a counterexample.
+    """
     # first, get the complement of the non-candidate DFA
-    dfa12 = (~dfa_) & dfa_subset_candidate_
-    bad_states = (s for s in dfa12.states() if dfa12._label(s))
+    should_be_empty = (~bigger) & smaller
+    bad_states = (s for s in should_be_empty.states() if should_be_empty._label(s))
     bad_state = next(bad_states, None)
     if bad_state is None:
         return None
-    all_paths = paths(dfa12, dfa12.start, end=bad_state)
+    all_paths = paths(should_be_empty, should_be_empty.start, end=bad_state)
 
     return next(all_paths)
