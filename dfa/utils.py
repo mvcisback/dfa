@@ -59,6 +59,6 @@ def find_equiv_counterexample(dfa_a, dfa_b):
 
 def find_subset_counterexample(smaller, bigger):
     """
-    Returns None if smaller ⊆ bigger; if not, returns x ∈ smaller \ bigger.
+    Returns None if smaller ⊆ bigger; if not, returns x ∈ smaller - bigger.
     """
     return find_word(~bigger & smaller)
