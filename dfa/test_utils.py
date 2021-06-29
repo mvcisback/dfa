@@ -1,5 +1,6 @@
 import dfa
-from dfa.utils import dict2dfa, dfa2dict, paths, find_subset_counterexample, find_equiv_counterexample
+from dfa.utils import dict2dfa, dfa2dict, paths
+from dfa.utils import find_subset_counterexample, find_equiv_counterexample
 
 
 def test_dict2dfa():
@@ -24,6 +25,7 @@ def test_paths():
 
     for word in access_strings:
         assert dfa_.transition(word, start=0) == 1
+
 
 def test_subset_equivalence():
     dfa_dict = {

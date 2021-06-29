@@ -39,23 +39,26 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
 
     return (word for word, path in paths_ if end is None or path[-1] == end)
 
+
+def find_word(lang: DFA):
+    """Returns a word in the language of DFA or None if language empty."""
+    accepted = (s for s in lang.states() if lang._label(s))
+    state = next(accepted, None)
+    if state is None:
+        return None
+    all_paths = paths(lang, lang.start, end=state)
+    return next(all_paths)
+
+
 def find_equiv_counterexample(dfa_a, dfa_b):
     """
     Returns None if DFAs are equivalent; if not, returns a counterexample.
     """
-    return find_subset_counterexample(dfa_b, dfa_a) if find_subset_counterexample(dfa_a, dfa_b) is None \
-        else find_subset_counterexample(dfa_a, dfa_b)
+    return find_word(dfa_a ^ dfa_b)
+
 
 def find_subset_counterexample(smaller, bigger):
     """
-    Returns None if dfa_subset_candidate is a subset of dfa; if not, returns a counterexample.
+    Returns None if smaller ⊆ bigger; if not, returns x ∈ smaller \ bigger.
     """
-    # first, get the complement of the non-candidate DFA
-    should_be_empty = (~bigger) & smaller
-    bad_states = (s for s in should_be_empty.states() if should_be_empty._label(s))
-    bad_state = next(bad_states, None)
-    if bad_state is None:
-        return None
-    all_paths = paths(should_be_empty, should_be_empty.start, end=bad_state)
-
-    return next(all_paths)
+    return find_word(~bigger & smaller)

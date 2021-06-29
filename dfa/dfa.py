@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import operator
+from functools import wraps
 from typing import Hashable, FrozenSet, Callable, Optional
 
 import attr
@@ -7,6 +11,15 @@ import funcy as fn
 State = Hashable
 Letter = Hashable
 Alphabet = FrozenSet[Letter]
+
+
+def boolean_only(method):
+    @wraps(method)
+    def wrapped(self, *args, **kwargs):
+        if self.outputs != {True, False}:
+            raise ValueError(f'{method} only defined for Boolean output DFAs.')
+        return method(self, *args, **kwargs)
+    return wrapped
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -77,22 +90,30 @@ class DFA:
 
         return visited
 
+    @boolean_only
     def __invert__(self):
-        if self.outputs != {True, False}:
-            raise ValueError("complement only defined for boolean output DFAs.")
         return attr.evolve(self, label=lambda s: not self._label(s))
 
-    def __and__(self, other):
+    def _bin_op(self, other, op):
         if (self.outputs != other.outputs) or (self.inputs != other.inputs):
-            raise ValueError("intersection requires common i/o interface.")
-        if self.outputs != {True, False}:
-            raise ValueError("intersect only defined for boolean output DFAs.")
+            raise ValueError(f"{op} requires common i/o interface.")
         return DFA(
             start=(self.start, other.start),
             inputs=self.inputs,  # Assumed shared alphabet
-            transition=lambda s, c: (self._transition(s[0], c), other._transition(s[1], c)),
-            label=lambda s: (self._label(s[0]) and other._label(s[1])))
+            transition=lambda s, c: (
+                self._transition(s[0], c),
+                other._transition(s[1], c)
+            ),
+            label=lambda s: op(self._label(s[0]), other._label(s[1])))
 
-    def __or__(self, other):
-        return ~((~self) & (~other))
+    @boolean_only
+    def __xor__(self, other: DFA) -> DFA:
+        return self._bin_op(other, operator.xor)
 
+    @boolean_only
+    def __or__(self, other: DFA) -> DFA:
+        return self._bin_op(other, operator.or_)
+
+    @boolean_only
+    def __and__(self, other: DFA) -> DFA:
+        return self._bin_op(other, operator.and_)
