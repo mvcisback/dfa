@@ -144,7 +144,7 @@ assert dfa1.transduce((1, 1, 1, 1)) == (False, False, False, True)
 
 ## Composition
 
-`DFA` objects can be combined in three ways:
+`DFA` objects can be combined in four ways:
 
 1. (Synchronous) Cascading Composition: Feed outputs of one `DFA` into another.
 
@@ -203,6 +203,27 @@ self_composed2 = parity | parity
 
 assert self_composed2.label([0, 1, 0]) == (1, 1)
 ```
+
+4. Boolean combinations (only works for Boolean output DFAs)
+
+```python
+dfa_neg     = ~dfa_1         # Complement of acepting set.
+dfa_1_or_2  = dfa_1 | dfa_2  # Union of accepting sets. 
+dfa_1_and_2 = dfa_1 & dfa_2  # Intersection of accepting sets.
+dfa_1_xor_2 = dfa_1 ^ dfa_2  # Symmetric difference of accepting sets.
+```
+
+## Language Queries
+
+Utility functions are available for testing if a language:
+
+1. Is empty: `utils.find_word`
+2. Is equivilent to another language: `utils.find_equiv_counterexample`
+3. Is a subset of a another language: `utils.find_subset_counterexample`
+
+These operate by returning `None` if the property holds, i.e.,
+`lang(dfa1) = ∅, lang(dfa1) ≡ lang(dfa2), lang(dfa1) ⊆ lang(dfa2)`, and
+returning a counterexample `Word` otherwise.
 
 ## DFA <-> Dictionary
 
