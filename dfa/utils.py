@@ -38,3 +38,27 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
     paths_ = tree.iddfs(max_depth=max_length, randomize=randomize)
 
     return (word for word, path in paths_ if end is None or path[-1] == end)
+
+
+def find_word(lang: DFA):
+    """Returns a word in the language of DFA or None if language empty."""
+    accepted = (s for s in lang.states() if lang._label(s))
+    state = next(accepted, None)
+    if state is None:
+        return None
+    all_paths = paths(lang, lang.start, end=state)
+    return next(all_paths)
+
+
+def find_equiv_counterexample(dfa_a, dfa_b):
+    """
+    Returns None if DFAs are equivalent; if not, returns a counterexample.
+    """
+    return find_word(dfa_a ^ dfa_b)
+
+
+def find_subset_counterexample(smaller, bigger):
+    """
+    Returns None if smaller ⊆ bigger; if not, returns x ∈ smaller \ bigger.
+    """
+    return find_word(~bigger & smaller)
