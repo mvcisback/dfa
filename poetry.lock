@@ -8,17 +8,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "attrs"
-version = "20.3.0"
+version = "21.2.0"
 description = "Classes Without Boilerplate"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "furo", "sphinx", "pre-commit"]
-docs = ["furo", "sphinx", "zope.interface"]
-tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
-tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
+dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface", "furo", "sphinx", "sphinx-notfound-page", "pre-commit"]
+docs = ["furo", "sphinx", "zope.interface", "sphinx-notfound-page"]
+tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface"]
+tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins"]
 
 [[package]]
 name = "certifi"
@@ -101,7 +101,7 @@ python-versions = "*"
 
 [[package]]
 name = "hypothesis"
-version = "5.49.0"
+version = "6.14.0"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -112,8 +112,8 @@ attrs = ">=19.2.0"
 sortedcontainers = ">=2.1.0,<3.0.0"
 
 [package.extras]
-all = ["black (>=19.10b0)", "click (>=7.0)", "django (>=2.2)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=0.25)", "pytest (>=4.3)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "importlib-resources (>=3.3.0)", "importlib-metadata", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
-cli = ["click (>=7.0)", "black (>=19.10b0)"]
+all = ["black (>=19.10b0)", "click (>=7.0)", "django (>=2.2)", "dpcontracts (>=0.4)", "lark-parser (>=0.6.5)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=0.25)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "importlib-resources (>=3.3.0)", "importlib-metadata (>=3.6)", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
+cli = ["click (>=7.0)", "black (>=19.10b0)", "rich (>=9.0.0)"]
 codemods = ["libcst (>=0.3.16)"]
 dateutil = ["python-dateutil (>=1.4)"]
 django = ["pytz (>=2014.1)", "django (>=2.2)"]
@@ -122,7 +122,7 @@ ghostwriter = ["black (>=19.10b0)"]
 lark = ["lark-parser (>=0.6.5)"]
 numpy = ["numpy (>=1.9.0)"]
 pandas = ["pandas (>=0.25)"]
-pytest = ["pytest (>=4.3)"]
+pytest = ["pytest (>=4.6)"]
 pytz = ["pytz (>=2014.1)"]
 redis = ["redis (>=3.0.0)"]
 zoneinfo = ["importlib-resources (>=3.3.0)", "backports.zoneinfo (>=0.2.1)", "tzdata (>=2020.4)"]
@@ -145,14 +145,14 @@ python-versions = "*"
 
 [[package]]
 name = "lazytree"
-version = "0.3.2"
+version = "0.3.3"
 description = "Python library for manipulating infinite trees."
 category = "main"
 optional = false
 python-versions = ">=3.6,<4.0"
 
 [package.dependencies]
-attrs = ">=20.0.0,<21.0.0"
+attrs = ">=21.0.0,<22.0.0"
 funcy = ">=1.12,<2.0"
 
 [[package]]
@@ -445,7 +445,7 @@ draw = ["pydot"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "f3186fcc1dbc2851ef50f68f7bc1b6b0340a5d513509fc8d537361b1c109aa93"
+content-hash = "204f3822b15c5bc20c20ddd6527d2ee8fcfe2821a49a9cf97a4ce1abb7909149"
 
 [metadata.files]
 atomicwrites = [
@@ -453,8 +453,8 @@ atomicwrites = [
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
 ]
 attrs = [
-    {file = "attrs-20.3.0-py2.py3-none-any.whl", hash = "sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6"},
-    {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
+    {file = "attrs-21.2.0-py2.py3-none-any.whl", hash = "sha256:149e90d6d8ac20db7a955ad60cf0e6881a3f20d37096140088356da6c716b0b1"},
+    {file = "attrs-21.2.0.tar.gz", hash = "sha256:ef6aaac3ca6cd92904cdd0d83f629a15f18053ec84e6432106f7a4d04ae4f5fb"},
 ]
 certifi = [
     {file = "certifi-2021.5.30-py2.py3-none-any.whl", hash = "sha256:50b1e4f8446b06f41be7dd6338db18e0990601dce795c2b1686458aa7e8fa7d8"},
@@ -540,8 +540,8 @@ funcy = [
     {file = "funcy-1.16.tar.gz", hash = "sha256:2775409b7dc9106283f1224d97e6df5f2c02e7291c8caed72764f5a115dffb50"},
 ]
 hypothesis = [
-    {file = "hypothesis-5.49.0-py3-none-any.whl", hash = "sha256:e91111f2f01abf2566041c4c86366aa7f08bfd5b3d858cc77a545fcf67df335e"},
-    {file = "hypothesis-5.49.0.tar.gz", hash = "sha256:36a4d5587c34193125d654b61bf9284e24a227d1edd339c49143378658a10c7d"},
+    {file = "hypothesis-6.14.0-py3-none-any.whl", hash = "sha256:27aa2af763af06b8b61ce65c09626cf1da6d3a6ff155900f3c581837b453313a"},
+    {file = "hypothesis-6.14.0.tar.gz", hash = "sha256:9bdee01ae260329b16117e9b0229a839b4a77747a985922653f595bd2a6a541a"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -552,8 +552,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 lazytree = [
-    {file = "lazytree-0.3.2-py3-none-any.whl", hash = "sha256:dc11850027ab2d4efa35210f6dd34837a1baf202578ae278e4d1a90f657fb8e4"},
-    {file = "lazytree-0.3.2.tar.gz", hash = "sha256:7a035efb5fb61d9209375e594780c1039af1feda02118f7fcbd74fdf6e4321da"},
+    {file = "lazytree-0.3.3-py3-none-any.whl", hash = "sha256:9c4854e6c9b6f51f72ea873247d5e876c3ec6ac3b10b41237e8b961c4179e02b"},
+    {file = "lazytree-0.3.3.tar.gz", hash = "sha256:8dd5b1b996157848796521758ad8e1da562a6e6419ceb3ade0d1d2f987a03726"},
 ]
 mako = [
     {file = "Mako-1.1.4-py2.py3-none-any.whl", hash = "sha256:aea166356da44b9b830c8023cd9b557fa856bd8b4035d6de771ca027dfc5cc6e"},
