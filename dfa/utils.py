@@ -1,10 +1,13 @@
 import funcy as fn
 from lazytree import LazyTree
 
-from dfa import DFA
+from dfa import DFA, State, Letter
 
 
-def dfa2dict(dfa_):
+DFADict = dict[State, tuple[Letter, dict[Letter, State]]]
+
+
+def dfa2dict(dfa_) -> DFADict:
     def outputs(state):
         trans = {a: dfa_.transition((a,), start=state) for a in dfa_.inputs}
         return dfa_._label(state), trans
