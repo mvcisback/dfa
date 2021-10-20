@@ -22,7 +22,7 @@ def boolean_only(method):
     return wrapped
 
 
-@attr.s(frozen=True, auto_attribs=True)
+@attr.frozen
 class DFA:
     start: State
     _label: Callable[[State], Letter] = attr.ib(
@@ -35,6 +35,23 @@ class DFA:
         converter=lambda x: x if x is None else frozenset(x), default=None
     )
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
+    _states: Optional[FrozenSet[State]] = None
+
+    def __repr__(self) -> int:
+        from dfa.utils import dfa2dict
+        import pprint
+
+        if self.inputs is not None:
+            return pprint.pformat(dfa2dict(self))
+        else:
+            start, inputs, outputs = self.start, self.inputs, self.outputs
+            return f'DFA({start=},{inputs=},{outputs=})'
+
+    def __hash__(self) -> int:
+        return hash(repr(self))
+
+    def __eq__(self, other: DFA) -> bool:
+        return isinstance(other, DFA) and (repr(self) == repr(other))
 
     def run(self, *, start=None, label=False):
         """Co-routine interface for simulating runs of the automaton.
@@ -72,8 +89,10 @@ class DFA:
     def transduce(self, word, *, start=None):
         return tuple(map(self._label, self.trace(word, start=start)))[:-1]
 
-    @fn.memoize()
     def states(self):
+        if self._states is not None:
+            return self._states
+
         assert self.inputs is not None, "Need to specify inputs field for DFA!"
 
         visited = set()
@@ -88,6 +107,8 @@ class DFA:
             successors = [self._transition(curr, a) for a in self.inputs]
             stack.extend(successors)
 
+        # Cache _states. Note: Safely violates frozen.
+        object.__setattr__(self, "_states", visited)
         return visited
 
     @boolean_only

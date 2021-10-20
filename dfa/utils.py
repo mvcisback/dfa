@@ -7,9 +7,9 @@ from dfa import DFA, State, Letter
 DFADict = dict[State, tuple[Letter, dict[Letter, State]]]
 
 
-def dfa2dict(dfa_) -> DFADict:
+def dfa2dict(dfa_) -> tuple[DFADict, State]:
     def outputs(state):
-        trans = {a: dfa_.transition((a,), start=state) for a in dfa_.inputs}
+        trans = {a: dfa_._transition(state, a) for a in dfa_.inputs}
         return dfa_._label(state), trans
 
     return {s: outputs(s) for s in dfa_.states()}, dfa_.start
