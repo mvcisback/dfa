@@ -22,7 +22,7 @@ def boolean_only(method):
     return wrapped
 
 
-@attr.frozen
+@attr.frozen(auto_detect=True)
 class DFA:
     start: State
     _label: Callable[[State], Letter] = attr.ib(
@@ -108,7 +108,7 @@ class DFA:
             stack.extend(successors)
 
         # Cache _states. Note: Safely violates frozen.
-        object.__setattr__(self, "_states", visited)
+        object.__setattr__(self, "_states", frozenset(visited))
         return visited
 
     @boolean_only
