@@ -1,5 +1,8 @@
 import funcy as fn
+import itertools
+import numpy as np
 from lazytree import LazyTree
+from collections import defaultdict
 
 from dfa import DFA
 
@@ -59,3 +62,31 @@ def find_subset_counterexample(smaller, bigger):
     all_paths = paths(should_be_empty, should_be_empty.start, end=bad_state)
 
     return next(all_paths)
+
+def enumerate_dfas(max_size: int, alphabet, min_size: int=2):
+    for num_states in range(min_size, max_size + 1):
+        #create transition dict
+        transitions = defaultdict(dict)
+        # for each symbol, generate an adjacency matrix
+        # create an iterator of all possible adjacency matrices
+        adj_list_gnr = itertools.permutations(np.arange(num_states))  # 1 adjacency list per state
+        # generate all possible adjacency matrices for all possible alphabets
+        total_gnr = itertools.product(adj_list_gnr, repeat=len(alphabet))
+        adjacency_lists = next(total_gnr, None)
+        while adjacency_lists is not None:
+            # go through each adjacency list and construct the DFA transitions
+            for alpha_idx, adj_list in enumerate(adjacency_lists):
+                for state_idx, resulting_state in enumerate(adj_list):
+                    transitions[state_idx][alphabet[alpha_idx]] = resulting_state
+            #generate all possible permutations of accepting states
+            accepting_bitvector_gnr = itertools.product([0,1], repeat=num_states)
+            #yield transitions
+            for accepting_bitvector in accepting_bitvector_gnr:
+                dfa_dict = {}
+                for acc_idx, is_accepting in enumerate(accepting_bitvector):
+                    new_value = (is_accepting, transitions[acc_idx])
+                    dfa_dict[acc_idx] = new_value
+                for possible_start_state in range(num_states):
+                    #now, go from dict to DFA
+                    yield dict2dfa(dfa_dict, start=possible_start_state)
+            adjacency_lists = next(total_gnr, None)
