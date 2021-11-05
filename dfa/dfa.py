@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import operator
 from functools import wraps
-from typing import Hashable, FrozenSet, Callable, Optional
+from typing import Hashable, FrozenSet, Callable, Optional, Sequence
 
 import attr
 import funcy as fn
@@ -35,7 +35,7 @@ class DFA:
         converter=lambda x: x if x is None else frozenset(x), default=None
     )
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
-    _states: Optional[FrozenSet[State]] = None
+    _states: Optional[Sequence[State]] = None
 
     def __repr__(self) -> int:
         from dfa.utils import dfa2dict
@@ -90,26 +90,28 @@ class DFA:
         return tuple(map(self._label, self.trace(word, start=start)))[:-1]
 
     def states(self):
-        if self._states is not None:
-            return self._states
+        if self._states is None:
+            assert self.inputs is not None, "Need to specify inputs field!"
 
-        assert self.inputs is not None, "Need to specify inputs field for DFA!"
+            try:
+                inputs = sorted(self.inputs)  # Make search deterministic.
+            except TypeError:
+                inputs = self.inputs
 
-        visited = set()
-        stack = [self.start]
-        while stack:
-            curr = stack.pop()
-            if curr in visited:
-                continue
-            else:
-                visited.add(curr)
+            visited, order = set(), []
+            stack = [self.start]
+            while stack:
+                curr = stack.pop()
+                if curr in visited:
+                    continue
+                else:
+                    order.append(curr)
+                    visited.add(curr)
 
-            successors = [self._transition(curr, a) for a in self.inputs]
-            stack.extend(successors)
-
-        # Cache _states. Note: Safely violates frozen.
-        object.__setattr__(self, "_states", frozenset(visited))
-        return visited
+                successors = [self._transition(curr, a) for a in inputs]
+                stack.extend(successors)
+            object.__setattr__(self, "_states", tuple(order))  # Cache states.
+        return frozenset(self._states)
 
     @boolean_only
     def __invert__(self):
