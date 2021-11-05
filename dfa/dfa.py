@@ -36,6 +36,7 @@ class DFA:
     )
     outputs: Alphabet = attr.ib(converter=frozenset, default={True, False})
     _states: Optional[Sequence[State]] = None
+    _hash: Optional[int] = None
 
     def __repr__(self) -> int:
         from dfa.utils import dfa2dict
@@ -54,11 +55,14 @@ class DFA:
         return dict2dfa(*dfa2dict(self, reindex=True))
 
     def __hash__(self) -> int:
-        return hash(repr(self.normalize()))
+        if self._hash is None:
+            _hash = hash(repr(self.normalize()))
+            object.__setattr__(self, "_hash", _hash)  # Cache hash.
+        return self._hash
 
     def __eq__(self, other: DFA) -> bool:
-        return isinstance(other, DFA) and \
-                (repr(self.normalize()) == repr(other.normalize()))
+        from dfa.utils import find_equiv_counterexample as test_equiv
+        return isinstance(other, DFA) and (test_equiv(self, other) is None)
 
     def run(self, *, start=None, label=False):
         """Co-routine interface for simulating runs of the automaton.
