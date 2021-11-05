@@ -62,7 +62,17 @@ class DFA:
 
     def __eq__(self, other: DFA) -> bool:
         from dfa.utils import find_equiv_counterexample as test_equiv
-        return isinstance(other, DFA) and (test_equiv(self, other) is None)
+        from dfa.utils import dfa2dict
+
+        if not isinstance(other, DFA):
+            return False
+
+        bool_ = {True, False}
+        if (self.outputs <= bool_) and (other.outputs <= bool_):
+            return test_equiv(self, other) is None
+        else:
+            return dfa2dict(self, reindex=True) \
+                    == dfa2dict(other, reindex=True)
 
     def run(self, *, start=None, label=False):
         """Co-routine interface for simulating runs of the automaton.
