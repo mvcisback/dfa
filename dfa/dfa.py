@@ -47,11 +47,18 @@ class DFA:
             start, inputs, outputs = self.start, self.inputs, self.outputs
             return f'DFA({start=},{inputs=},{outputs=})'
 
+    def normalize(self) -> DFA:
+        """Normalizes the state indexing and memoizes transitions/labels."""
+        from dfa.utils import dfa2dict
+        from dfa.utils import dict2dfa
+        return dict2dfa(*dfa2dict(self, reindex=True))
+
     def __hash__(self) -> int:
-        return hash(repr(self))
+        return hash(repr(self.normalize()))
 
     def __eq__(self, other: DFA) -> bool:
-        return isinstance(other, DFA) and (repr(self) == repr(other))
+        return isinstance(other, DFA) and \
+                (repr(self.normalize()) == repr(other.normalize()))
 
     def run(self, *, start=None, label=False):
         """Co-routine interface for simulating runs of the automaton.
@@ -93,10 +100,11 @@ class DFA:
         if self._states is None:
             assert self.inputs is not None, "Need to specify inputs field!"
 
+            # Make search deterministic.
             try:
-                inputs = sorted(self.inputs)  # Make search deterministic.
+                inputs = sorted(self.inputs)  # Try to respect inherent order.
             except TypeError:
-                inputs = self.inputs
+                inputs = sorted(self.inputs, key=id)  # Fall by to object ids.
 
             visited, order = set(), []
             stack = [self.start]

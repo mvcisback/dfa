@@ -7,12 +7,19 @@ from dfa import DFA, State, Letter
 DFADict = dict[State, tuple[Letter, dict[Letter, State]]]
 
 
-def dfa2dict(dfa_) -> tuple[DFADict, State]:
+def dfa2dict(dfa_, *, reindex=False) -> tuple[DFADict, State]:
+    dfa_.states()  # Explicitly compute states.
+    if reindex:
+        relabel = {s: i for i, s in enumerate(dfa_._states)}.get
+    else:
+        relabel = fn.identity
+
     def outputs(state):
-        trans = {a: dfa_._transition(state, a) for a in dfa_.inputs}
+        trans = {a: relabel(dfa_._transition(state, a)) for a in dfa_.inputs}
         return dfa_._label(state), trans
 
-    return {s: outputs(s) for s in dfa_.states()}, dfa_.start
+    dfa_dict = {relabel(s): outputs(s) for s in dfa_.states()}
+    return dfa_dict, relabel(dfa_.start)
 
 
 def dict2dfa(dfa_dict, start):
