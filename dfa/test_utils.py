@@ -1,5 +1,6 @@
 import dfa
-from dfa.utils import dict2dfa, dfa2dict, paths, find_subset_counterexample, find_equiv_counterexample
+from dfa.utils import dict2dfa, dfa2dict, paths, \
+    find_subset_counterexample, find_equiv_counterexample, minimize_dfa
 
 
 def test_dict2dfa():
@@ -57,3 +58,23 @@ def test_subset_equivalence():
     assert find_subset_counterexample(dfa1, dfa2) is None
     assert find_subset_counterexample(dfa2, dfa1) is not None
     assert find_equiv_counterexample(dfa1, dfa3) is None
+
+def test_minimize():
+    dfa_dict_super = {
+        0: (False, {0: 1, 1: 2}),
+        1: (False, {0: 0, 1: 3}),
+        2: (True, {0: 4, 1: 5}),
+        3: (True, {0: 4, 1: 5}),
+        4: (True, {0: 4, 1: 5}),
+        5: (False, {0: 5, 1: 5})
+    }
+
+    dfa_dict_min = {
+        0: (False, {0: 0, 1: 1}),
+        1: (True, {0: 1, 1: 2}),
+        2: (False, {0: 2, 1: 2}),
+    }
+    dfa1 = dict2dfa(dfa_dict_super, 0)
+    true_dfa = dict2dfa(dfa_dict_min, 0)
+    dfa2 = minimize_dfa(dfa1)
+    assert find_equiv_counterexample(true_dfa, dfa2) is None
