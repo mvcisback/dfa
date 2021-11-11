@@ -1,5 +1,3 @@
-from typing import Optional
-
 import funcy as fn
 import itertools
 from bidict import bidict
@@ -106,7 +104,7 @@ def _enumerate_dfas(alphabet, min_size, outputs):
                 for state, label in enumerate(accepting):
                     dfa_dict[state] = (label, transitions[state])
 
-                # Generate all possible start states. 
+                # Generate all possible start states.
                 for start in range(num_states):
                     yield dict2dfa(dfa_dict, start=state, outputs=outputs)
 
@@ -123,11 +121,11 @@ def minimize(orig: DFA):
     p_part = [frozenset(grp) for grp in groups]
     w_part = set(p_part)
     while len(w_part) > 0:
-        curr_set = w_part.pop()
+        curr = w_part.pop()
         for char in orig.inputs:
             new_p_part = set()
-            x_set = {s for s in states if orig._transition(s, char) in curr_set}
-            for y_set in p_part: # Try to shatter equivalence classes.
+            x_set = {s for s in states if orig._transition(s, char) in curr}
+            for y_set in p_part:  # Try to shatter equivalence classes.
                 intersect_set = y_set & x_set
                 diff_set = y_set - x_set
 
@@ -135,7 +133,7 @@ def minimize(orig: DFA):
                     new_p_part.add(intersect_set)
                     new_p_part.add(diff_set)
 
-                    if y_set in w_part: 
+                    if y_set in w_part:
                         w_part.remove(y_set)
                         w_part.add(intersect_set)
                         w_part.add(diff_set)
@@ -152,7 +150,7 @@ def minimize(orig: DFA):
     for grp in p_part:
         rep = orig.start if (orig.start in grp) else fn.first(grp)
         state2rep.update((s, rep) for s in grp)
-    
+
     return DFA(
         start=orig.start,
         inputs=orig.inputs,
