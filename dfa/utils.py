@@ -1,11 +1,12 @@
+from typing import Optional
+
 import funcy as fn
 import itertools
-import numpy as np
+from bidict import bidict
 from lazytree import LazyTree
 
 from dfa import DFA, State, Letter
 from collections import defaultdict
-
 
 
 DFADict = dict[State, tuple[Letter, dict[Letter, State]]]
@@ -78,13 +79,13 @@ def find_subset_counterexample(smaller, bigger):
     return find_word(~bigger & smaller)
 
 
-def enumerate_dfas(max_size: int, alphabet, min_size: int=2):
+def enumerate_dfas(alphabet, min_size: int = 2, max_size: Optional[int] = None)  :
     for num_states in range(min_size, max_size + 1):
         #create transition dict
         transitions = defaultdict(dict)
         # for each symbol, generate an adjacency matrix
         # create an iterator of all possible adjacency matrices
-        adj_list_gnr = itertools.permutations(np.arange(num_states))  # 1 adjacency list per state
+        adj_list_gnr = itertools.permutations(range(num_states))  # 1 adjacency list per state
         # generate all possible adjacency matrices for all possible alphabets
         total_gnr = itertools.product(adj_list_gnr, repeat=len(alphabet))
         adjacency_lists = next(total_gnr, None)
@@ -106,32 +107,33 @@ def enumerate_dfas(max_size: int, alphabet, min_size: int=2):
                     yield dict2dfa(dfa_dict, start=possible_start_state)
             adjacency_lists = next(total_gnr, None)
 
-def minimize_dfa(dfa):
-    # implementation of Hopcroft's DFA minimization algorithm
-    accepting_states = set()
-    rejecting_states = set()
-    for state in dfa.states():
-        if dfa._label(state):
-            accepting_states.add(state)
-        else:
-            rejecting_states.add(state)
-    p_part = {frozenset(accepting_states), frozenset(rejecting_states)}
-    w_part = {frozenset(accepting_states), frozenset(rejecting_states)}
+
+def minimize_dfa(orig: DFA):
+    """Minimize a DFA using Hopcroft's algorithm."""
+    states = orig.states()
+
+    # Group states by label.
+    groups = fn.group_by(orig._label, states)
+    groups = fn.walk_values(frozenset, groups)
+    groups = bidict(groups).inv
+
+    p_part = [frozenset(grp) for grp in groups]
+    w_part = set(p_part)
     while len(w_part) > 0:
         curr_set = w_part.pop()
-        for char in dfa.inputs:
-            x_set = set()
-            for state in dfa.states():
-                if dfa._transition(state, char) in curr_set:
-                    x_set.add(state)
+        for char in orig.inputs:
+            x_set = {s for s in states if orig._transition(s, char) in curr_set}
+
             new_p_part = set()
-            for y_set in p_part:
-                intersect_set = frozenset(y_set.intersection(x_set))
-                diff_set = frozenset(y_set - x_set)
-                if len(intersect_set) > 0 and len(diff_set) > 0:
+            for y_set in p_part: # Try to shatter equivalence classes.
+                intersect_set = y_set & x_set
+                diff_set = y_set - x_set
+
+                if intersect_set and diff_set:  # Discovered split.
                     new_p_part.add(intersect_set)
                     new_p_part.add(diff_set)
-                    if y_set in w_part:
+
+                    if y_set in w_part: 
                         w_part.remove(y_set)
                         w_part.add(intersect_set)
                         w_part.add(diff_set)
@@ -143,21 +145,17 @@ def minimize_dfa(dfa):
                 else:
                     new_p_part.add(y_set)
             p_part = new_p_part
-    # take the partition P and create a DFA from it
-    minimized_dfa_dict = {}
-    #make a dict where we can hash the new state (idx) given old state sets
-    set_to_idx_dict = dict((x[1], x[0]) for x in enumerate(p_part))
-    start_state = None
-    #use that to get transitions between sets and then construct the dfa from it
-    for state_set, idx in set_to_idx_dict.items():
-        if dfa.start in state_set:
-            start_state = idx
-        state_transitions = {}
-        is_accepting = True if len(state_set.intersection(accepting_states)) > 0 else False
-        for char in dfa.inputs:
-            old_state = dfa._transition(list(state_set)[0], char)
-            for partition in set_to_idx_dict:
-                if old_state in partition:
-                    state_transitions[char] = set_to_idx_dict[partition]
-        minimized_dfa_dict[idx] = (is_accepting, state_transitions)
-    return dict2dfa(minimized_dfa_dict, start_state)
+
+    # Create mapping from states to representative states of equivalence class.
+    state2rep = {}
+    for grp in p_part:
+        rep = orig.start if (orig.start in grp) else fn.first(grp)
+        state2rep.update((s, rep) for s in grp)
+    
+    return DFA(
+        start=orig.start,
+        inputs=orig.inputs,
+        outputs=orig.outputs,
+        label=orig._label,
+        transition=lambda s, c: state2rep[orig._transition(s, c)]
+    )

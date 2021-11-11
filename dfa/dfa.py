@@ -16,7 +16,7 @@ Alphabet = FrozenSet[Letter]
 def boolean_only(method):
     @wraps(method)
     def wrapped(self, *args, **kwargs):
-        if self.outputs != {True, False}:
+        if not (self.outputs <= {True, False}):
             raise ValueError(f'{method} only defined for Boolean output DFAs.')
         return method(self, *args, **kwargs)
     return wrapped

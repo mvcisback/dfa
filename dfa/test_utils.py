@@ -1,6 +1,7 @@
 import dfa
 from dfa.utils import dict2dfa, dfa2dict, paths
-from dfa.utils import find_subset_counterexample, find_equiv_counterexample, minimize_dfa
+from dfa.utils import find_subset_counterexample, find_equiv_counterexample
+from dfa.utils import enumerate_dfas, minimize_dfa
 
 
 def test_dict2dfa():
@@ -25,6 +26,10 @@ def test_paths():
 
     for word in access_strings:
         assert dfa_.transition(word, start=0) == 1
+
+
+def test_enumerate():
+    pass
 
 
 def test_subset_equivalence():
@@ -59,6 +64,7 @@ def test_subset_equivalence():
     assert find_subset_counterexample(dfa1, dfa2) is None
     assert find_subset_counterexample(dfa2, dfa1) is not None
     assert find_equiv_counterexample(dfa1, dfa3) is None
+
 
 def test_minimize():
     dfa_dict_super = {
