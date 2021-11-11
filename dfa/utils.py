@@ -27,11 +27,14 @@ def dfa2dict(dfa_, *, reindex=False) -> tuple[DFADict, State]:
     return dfa_dict, relabel(dfa_.start)
 
 
-def dict2dfa(dfa_dict, start):
+def dict2dfa(dfa_dict, start, outputs=None):
+    outputs = set() if outputs is None else set(outputs)
+    outputs |= set(fn.pluck(0, dfa_dict.values()))
+
     return DFA(
         start=start,
         inputs=fn.mapcat(dict.keys, fn.pluck(1, dfa_dict.values())),
-        outputs=fn.pluck(0, dfa_dict.values()),
+        outputs=outputs,
         transition=lambda s, c: dfa_dict[s][1][c],
         label=lambda s: dfa_dict[s][0],
     )
@@ -79,36 +82,36 @@ def find_subset_counterexample(smaller, bigger):
     return find_word(~bigger & smaller)
 
 
-def enumerate_dfas(alphabet, min_size: int = 2, max_size: Optional[int] = None)  :
-    for num_states in range(min_size, max_size + 1):
-        #create transition dict
+def enumerate_dfas(alphabet, min_size: int = 2, outputs=(False, True)):
+    dfas = _enumerate_dfas(alphabet, min_size, outputs)
+    yield from fn.distinct(dfas, key=minimize)
+
+
+def _enumerate_dfas(alphabet, min_size, outputs):
+    for num_states in fn.count(start=min_size):
         transitions = defaultdict(dict)
-        # for each symbol, generate an adjacency matrix
-        # create an iterator of all possible adjacency matrices
-        adj_list_gnr = itertools.permutations(range(num_states))  # 1 adjacency list per state
-        # generate all possible adjacency matrices for all possible alphabets
+        # Create an iterator of all possible adjacency matrices.
+        adj_list_gnr = itertools.permutations(range(num_states))
+        # Generate all possible letter -> adjacency matrix maps.
         total_gnr = itertools.product(adj_list_gnr, repeat=len(alphabet))
-        adjacency_lists = next(total_gnr, None)
-        while adjacency_lists is not None:
-            # go through each adjacency list and construct the DFA transitions
-            for alpha_idx, adj_list in enumerate(adjacency_lists):
+        for adjacency_lists in total_gnr:
+            # Construct the DFA transitions based on adjacency lists.
+            for char, adj_list in zip(alphabet, adjacency_lists):
                 for state_idx, resulting_state in enumerate(adj_list):
-                    transitions[state_idx][alphabet[alpha_idx]] = resulting_state
-            #generate all possible permutations of accepting states
-            accepting_bitvector_gnr = itertools.product([0,1], repeat=num_states)
-            #yield transitions
-            for accepting_bitvector in accepting_bitvector_gnr:
+                    transitions[state_idx][char] = resulting_state
+
+            # Generate all possible permutations of accepting states.
+            for accepting in itertools.product(outputs, repeat=num_states):
                 dfa_dict = {}
-                for acc_idx, is_accepting in enumerate(accepting_bitvector):
-                    new_value = (is_accepting, transitions[acc_idx])
-                    dfa_dict[acc_idx] = new_value
-                for possible_start_state in range(num_states):
-                    #now, go from dict to DFA
-                    yield dict2dfa(dfa_dict, start=possible_start_state)
-            adjacency_lists = next(total_gnr, None)
+                for state, label in enumerate(accepting):
+                    dfa_dict[state] = (label, transitions[state])
+
+                # Generate all possible start states. 
+                for start in range(num_states):
+                    yield dict2dfa(dfa_dict, start=state, outputs=outputs)
 
 
-def minimize_dfa(orig: DFA):
+def minimize(orig: DFA):
     """Minimize a DFA using Hopcroft's algorithm."""
     states = orig.states()
 
@@ -122,9 +125,8 @@ def minimize_dfa(orig: DFA):
     while len(w_part) > 0:
         curr_set = w_part.pop()
         for char in orig.inputs:
-            x_set = {s for s in states if orig._transition(s, char) in curr_set}
-
             new_p_part = set()
+            x_set = {s for s in states if orig._transition(s, char) in curr_set}
             for y_set in p_part: # Try to shatter equivalence classes.
                 intersect_set = y_set & x_set
                 diff_set = y_set - x_set
@@ -137,11 +139,10 @@ def minimize_dfa(orig: DFA):
                         w_part.remove(y_set)
                         w_part.add(intersect_set)
                         w_part.add(diff_set)
+                    elif len(intersect_set) <= len(diff_set):
+                        w_part.add(intersect_set)
                     else:
-                        if len(intersect_set) <= len(diff_set):
-                            w_part.add(intersect_set)
-                        else:
-                            w_part.add(diff_set)
+                        w_part.add(diff_set)
                 else:
                     new_p_part.add(y_set)
             p_part = new_p_part
@@ -158,4 +159,4 @@ def minimize_dfa(orig: DFA):
         outputs=orig.outputs,
         label=orig._label,
         transition=lambda s, c: state2rep[orig._transition(s, c)]
-    )
+    ).normalize()

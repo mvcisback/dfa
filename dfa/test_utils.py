@@ -1,7 +1,11 @@
+from itertools import combinations
+
+import funcy as fn
+
 import dfa
 from dfa.utils import dict2dfa, dfa2dict, paths
 from dfa.utils import find_subset_counterexample, find_equiv_counterexample
-from dfa.utils import enumerate_dfas, minimize_dfa
+from dfa.utils import enumerate_dfas, minimize
 
 
 def test_dict2dfa():
@@ -26,10 +30,6 @@ def test_paths():
 
     for word in access_strings:
         assert dfa_.transition(word, start=0) == 1
-
-
-def test_enumerate():
-    pass
 
 
 def test_subset_equivalence():
@@ -83,5 +83,11 @@ def test_minimize():
     }
     dfa1 = dict2dfa(dfa_dict_super, 0)
     true_dfa = dict2dfa(dfa_dict_min, 0)
-    dfa2 = minimize_dfa(dfa1)
+    dfa2 = minimize(dfa1)
     assert find_equiv_counterexample(true_dfa, dfa2) is None
+
+
+def test_enumerate():
+    dfas = fn.take(10, enumerate_dfas('abc'))
+    for dfa1, dfa2 in combinations(dfas, 2):
+        assert find_equiv_counterexample(dfa1, dfa2) is not None

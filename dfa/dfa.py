@@ -43,7 +43,7 @@ class DFA:
         import pprint
 
         if self.inputs is not None:
-            return pprint.pformat(dfa2dict(self))
+            return 'DFA' + pprint.pformat(dfa2dict(self))
         else:
             start, inputs, outputs = self.start, self.inputs, self.outputs
             return f'DFA({start=},{inputs=},{outputs=})'
