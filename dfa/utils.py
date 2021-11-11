@@ -80,13 +80,13 @@ def find_subset_counterexample(smaller, bigger):
     return find_word(~bigger & smaller)
 
 
-def enumerate_dfas(alphabet, min_size: int = 2, outputs=(False, True)):
-    dfas = _enumerate_dfas(alphabet, min_size, outputs)
+def enumerate_dfas(alphabet, outputs=(False, True)):
+    dfas = _enumerate_dfas(alphabet, outputs)
     yield from fn.distinct(dfas, key=minimize)
 
 
-def _enumerate_dfas(alphabet, min_size, outputs):
-    for num_states in fn.count(start=min_size):
+def _enumerate_dfas(alphabet, outputs):
+    for num_states in fn.count(start=1):
         transitions = defaultdict(dict)
         # Create an iterator of all possible adjacency matrices.
         adj_list_gnr = itertools.permutations(range(num_states))
@@ -104,6 +104,7 @@ def _enumerate_dfas(alphabet, min_size, outputs):
                 for state, label in enumerate(accepting):
                     dfa_dict[state] = (label, transitions[state])
 
+                assert len(dfa_dict) == num_states
                 # Generate all possible start states.
                 for start in range(num_states):
                     yield dict2dfa(dfa_dict, start=state, outputs=outputs)
