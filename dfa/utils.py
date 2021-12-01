@@ -58,12 +58,14 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
 
 def find_word(lang: DFA):
     """Returns a word in the language of DFA or None if language empty."""
-    accepted = (s for s in lang.states() if lang._label(s))
-    state = next(accepted, None)
-    if state is None:
-        return None
-    all_paths = paths(lang, lang.start, end=state)
-    return next(all_paths)
+    return next(words(lang), None)
+
+
+def words(lang: DFA):
+    """Iterates over all works word in the language of DFA or None."""
+    accepting = (s for s in lang.states() if lang._label(s))
+    paths_to_accepting = (paths(lang, lang.start, end=s) for s in accepting)
+    yield from fn.interleave(*paths_to_accepting)
 
 
 def find_equiv_counterexample(dfa_a, dfa_b):

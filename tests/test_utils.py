@@ -5,7 +5,7 @@ import funcy as fn
 import dfa
 from dfa.utils import dict2dfa, dfa2dict, paths
 from dfa.utils import find_subset_counterexample, find_equiv_counterexample
-from dfa.utils import enumerate_dfas, minimize
+from dfa.utils import enumerate_dfas, minimize, words, find_word
 
 
 def test_dict2dfa():
@@ -91,3 +91,20 @@ def test_enumerate():
     dfas = fn.take(10, enumerate_dfas('abc'))
     for dfa1, dfa2 in combinations(dfas, 2):
         assert find_equiv_counterexample(dfa1, dfa2) is not None
+
+
+def test_words():
+    dfa_dict = {
+        0: (False, {0: 0, 1: 1}),
+        1: (False, {0: 1, 1: 2}),
+        2: (False, {0: 2, 1: 3}),
+        3: (True, {0: 3, 1: 0})
+    }
+    lang = dict2dfa(dfa_dict, start=0)
+    x = find_word(lang)
+    assert x is not None
+    assert lang.label(x)
+
+    xs = set(fn.take(5, words(lang)))
+    assert len(xs) == 5
+    assert all(lang.label(x) for x in xs)
