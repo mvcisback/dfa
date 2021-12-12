@@ -140,8 +140,8 @@ class DFA:
         return attr.evolve(self, label=lambda s: not self._label(s))
 
     def _bin_op(self, other, op):
-        if (self.outputs != other.outputs) or (self.inputs != other.inputs):
-            raise ValueError(f"{op} requires common i/o interface.")
+        if self.inputs != other.inputs:
+            raise ValueError(f"{op} requires shared inputs.")
         return DFA(
             start=(self.start, other.start),
             inputs=self.inputs,  # Assumed shared alphabet
@@ -149,6 +149,7 @@ class DFA:
                 self._transition(s[0], c),
                 other._transition(s[1], c)
             ),
+            outputs=self.outputs | other.outputs,
             label=lambda s: op(self._label(s[0]), other._label(s[1])))
 
     @boolean_only
