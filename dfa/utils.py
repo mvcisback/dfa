@@ -39,8 +39,8 @@ def dict2dfa(dfa_dict, start, outputs=None):
 
 
 def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
-    """Generates all paths froms start to end, subject to max_length.
-    """
+    """Generates all paths froms start to end, subject to max_length."""
+    # TODO: reimplement in terms of networkx.
     if max_length is None:
         max_length = float('inf')
 
@@ -51,9 +51,25 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
             yield word + (i,), path + (state2,)
 
     tree = LazyTree(root=((), (dfa_.start,)), child_map=child_map)
-    paths_ = tree.iddfs(max_depth=max_length, randomize=randomize)
+    paths_by_depth = tree.iddfs(
+        max_depth=max_length,
+        randomize=randomize,
+        flatten=False
+    )
+ 
+    width = len(dfa_.states())
+    unreachable = True
+    for depth, paths in enumerate(paths_by_depth):
+        if unreachable and (depth == width):
+            return
+        words = (w for w, path in paths if end is None or path[-1] == end)
+        word = fn.first(words)
+        if word is None:
+            continue
 
-    return (word for word, path in paths_ if end is None or path[-1] == end)
+        yield word
+        yield from words
+        unreachable &= word is None
 
 
 def find_word(lang: DFA):
