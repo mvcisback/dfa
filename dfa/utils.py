@@ -56,20 +56,21 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
         randomize=randomize,
         flatten=False
     )
- 
+
     width = len(dfa_.states())
     unreachable = True
     for depth, paths in enumerate(paths_by_depth):
-        if unreachable and (depth == width):
+        if depth > max_length:
+            return
+        if unreachable and (depth >= width):
             return
         words = (w for w, path in paths if end is None or path[-1] == end)
         word = fn.first(words)
         if word is None:
             continue
-
+        unreachable = False
         yield word
         yield from words
-        unreachable &= word is None
 
 
 def find_word(lang: DFA):
@@ -77,11 +78,11 @@ def find_word(lang: DFA):
     return next(words(lang), None)
 
 
-def words(lang: DFA):
+def words(lang: DFA, max_length=float('inf')):
     """Iterates over all works word in the language of DFA or None."""
-    accepting = (s for s in lang.states() if lang._label(s))
-    paths_to_accepting = (paths(lang, lang.start, end=s) for s in accepting)
-    yield from fn.interleave(*paths_to_accepting)
+    targets = (s for s in lang.states() if lang._label(s))
+    paths_by_target = (paths(lang, lang.start, end=s) for s in targets)
+    yield from fn.interleave(*paths_by_target)
 
 
 def find_equiv_counterexample(dfa_a, dfa_b):
