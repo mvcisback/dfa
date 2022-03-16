@@ -56,3 +56,25 @@ def test_run_count():
         count += 1
         state = machine.send(1)
     assert count == 4
+
+
+def test_int_encoding():
+    is_left = DFA(
+        start="left",
+        inputs=["move right", "move left"],
+        label=lambda s: s == "left",
+        transition=lambda s, c: "left" if c == "move left" else "right",
+    )
+    empty = DFA(
+        start=False,
+        inputs={0, 1},
+        label=lambda _: False,
+        transition=lambda *_: False,
+    )
+    assert empty.to_int() == 0b1_0_10_1_0
+    assert is_left.to_int() == 0b1_10_1_10_1_0_0_0_011_100
+
+    for lang in [empty, ~empty, is_left, ~is_left]:
+        inputs = sorted(lang.inputs)
+        lang2 = DFA.from_int(lang.to_int(), inputs)
+        assert lang == lang2

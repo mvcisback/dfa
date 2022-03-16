@@ -15,6 +15,7 @@ lazytree = "^0.3.1"
 pydot = {version = "^1.4", optional = true}
 pytest-xdist = "^2.1.0"
 bidict = "^0.21.4"
+bitarray = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 hypothesis = "^6.0.0"
