@@ -60,7 +60,7 @@ class DFA:
 
     @boolean_only
     def to_int(self, input_order: OrderedAlphabet | None = None) -> int:
-        from dfa.utils import dfa2dict
+        from dfa.utils import dfa2dict, minimize
         from bitarray import bitarray
         from bitarray.util import int2ba, ba2int
 
@@ -68,7 +68,7 @@ class DFA:
             input_order = sorted(self.inputs)
         elif not (set(input_order) < self.inputs):
             raise ValueError('Some inputs missing from input order.')
-        graph, start = dfa2dict(self, reindex=True)
+        graph, start = dfa2dict(minimize(self), reindex=True)
         accepting = {s for s, (label, _) in graph.items() if label}
 
         state_bits = bits_needed(len(graph))
