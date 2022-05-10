@@ -1,7 +1,8 @@
 import funcy as fn
 import itertools
+import random
+from collections import deque
 from bidict import bidict
-from lazytree import LazyTree
 
 from dfa import DFA, State, Letter
 from collections import defaultdict
@@ -40,37 +41,23 @@ def dict2dfa(dfa_dict, start, outputs=None):
 
 def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
     """Generates all paths froms start to end, subject to max_length."""
-    # TODO: reimplement in terms of networkx.
     if max_length is None:
         max_length = float('inf')
 
-    def child_map(word_path):
-        word, path = word_path
-        for i in dfa_.inputs:
-            state2 = dfa_.transition((i,), start=path[-1])
-            yield word + (i,), path + (state2,)
-
-    tree = LazyTree(root=((), (dfa_.start,)), child_map=child_map)
-    paths_by_depth = tree.iddfs(
-        max_depth=max_length,
-        randomize=randomize,
-        flatten=False
-    )
-
-    width = len(dfa_.states())
-    unreachable = True
-    for depth, paths in enumerate(paths_by_depth):
-        if depth > max_length:
-            return
-        if unreachable and (depth >= width):
-            return
-        words = (w for w, path in paths if end is None or path[-1] == end)
-        word = fn.first(words)
-        if word is None:
+    stack = deque([((), start)])
+    while stack:
+        path, state = stack.pop()
+        if len(path) > max_length:
             continue
-        unreachable = False
-        yield word
-        yield from words
+        elif (end is None) or (state == end):
+            yield path
+
+        kids = [(path + (c,), dfa_._transition(state, c)) for c in dfa_.inputs]
+
+        if randomize:
+            random.shuffle(kids)
+
+        stack.extendleft(kids)
 
 
 def find_word(lang: DFA):
@@ -79,7 +66,7 @@ def find_word(lang: DFA):
 
 
 def words(lang: DFA, max_length=float('inf')):
-    """Iterates over all works word in the language of DFA or None."""
+    """Iterates over all words in lang."""
     targets = (s for s in lang.states() if lang._label(s))
     paths_by_target = (paths(lang, lang.start, end=s) for s in targets)
     yield from fn.interleave(*paths_by_target)
