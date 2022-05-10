@@ -188,7 +188,36 @@ assert (dfa_dict, 0) == (dfa_dict2, start)
 assert dfa1.states() == {0, 1, 2, 3}
 ```
 
-## Sampling Paths
+## Finding Words and Access strings
+
+To generate accepting strings (words) in a DFA (breadth first using string length) one can use the `dfa.utils.words` function:
+
+```python
+from dfa.utils.import dfa2dict, words, find_words
+
+dfa_dict = {
+    0: (False, {0: 0, 1: 1}),
+    1: (False, {0: 1, 1: 2}),
+    2: (False, {0: 2, 1: 3}),
+    3: (True, {0: 3, 1: 0})
+}
+lang = dict2dfa(dfa_dict, start=0)
+
+xs = set(fn.take(5, words(lang)))
+assert len(xs) == 5
+assert all(lang.label(x) for x in xs)
+```
+
+To get a single word, a helper function is provided in `dfa.utils.find_word` which returns `None` if the language of the DFA is empty:
+
+```python
+# ... Same as above ...
+
+x = find_word(lang)
+assert x is not None
+assert lang.label(x)
+```
+
 
 Often times, it is useful to sample a path between two states, say `a`
 and `b`. `dfa` supports this using `dfa.utils.paths`. This function
