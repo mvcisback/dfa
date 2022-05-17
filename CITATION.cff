@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Vazquez-Chanlatte"
+  given-names: "Marcell"
+  orcid: "https://orcid.org/0000-0002-1248-0000"
+- family-names: "Shah"
+  given-names: "Ameesh"
+title: "dfa"
+version: 1
+date-released: 2022-05-16
+url: "https://github.com/mvcisback/dfa"
