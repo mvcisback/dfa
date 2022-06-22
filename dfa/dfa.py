@@ -264,6 +264,38 @@ class DFA:
         return frozenset(self._states)
 
     @boolean_only
+    def find_accepting_word(self):
+        """
+            DFS implementation of finding a shortest accepting word.
+            :return: an accepting word if it exists, otherwise None
+            """
+        # Make search deterministic.
+        try:
+            inputs = sorted(self.inputs)  # Try to respect inherent order.
+        except TypeError:
+            inputs = sorted(self.inputs, key=id)  # Fall by to object ids.
+
+        visited = set()
+        word = []
+
+        def _find_accepting_word_recursive(state):
+            if self._label(state):
+                return True
+            visited.add(state)
+            for i in inputs:
+                next_state = self._transition(state, i)
+                if next_state not in visited:
+                    word.append(i)
+                    if _find_accepting_word_recursive(next_state):
+                        return True
+                    word.pop()
+
+        if _find_accepting_word_recursive(self.start):
+            return word
+        else:
+            return None
+
+    @boolean_only
     def __invert__(self):
         return attr.evolve(self, label=lambda s: not self._label(s))
 
