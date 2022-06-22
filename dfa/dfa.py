@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import operator
 from functools import wraps
-from typing import Hashable, FrozenSet, Callable, Optional, Sequence
+from typing import Hashable, FrozenSet, Callable, Optional, Sequence, Iterable
 
 import attr
 import funcy as fn
@@ -11,6 +11,7 @@ State = Hashable
 Letter = Hashable
 Alphabet = FrozenSet[Letter]
 OrderedAlphabet = Sequence[Letter]
+Word = Sequence[Alphabet]
 
 
 def boolean_only(method):
@@ -238,62 +239,45 @@ class DFA:
     def transduce(self, word, *, start=None):
         return tuple(map(self._label, self.trace(word, start=start)))[:-1]
 
-    def states(self):
-        if self._states is None:
-            assert self.inputs is not None, "Need to specify inputs field!"
+    def walk(self) -> Iterable[State, Word]:
+        """Performs DFS through DFA yields states and their access strings."""
+        assert self.inputs is not None, "Need to specify inputs field!"
 
-            # Make search deterministic.
-            try:
-                inputs = sorted(self.inputs)  # Try to respect inherent order.
-            except TypeError:
-                inputs = sorted(self.inputs, key=id)  # Fall by to object ids.
-
-            visited, order = set(), []
-            stack = [self.start]
-            while stack:
-                curr = stack.pop()
-                if curr in visited:
-                    continue
-                else:
-                    order.append(curr)
-                    visited.add(curr)
-
-                successors = [self._transition(curr, a) for a in inputs]
-                stack.extend(successors)
-            object.__setattr__(self, "_states", tuple(order))  # Cache states.
-        return frozenset(self._states)
-
-    @boolean_only
-    def find_accepting_word(self):
-        """
-            DFS implementation of finding a shortest accepting word.
-            :return: an accepting word if it exists, otherwise None
-            """
         # Make search deterministic.
         try:
             inputs = sorted(self.inputs)  # Try to respect inherent order.
         except TypeError:
-            inputs = sorted(self.inputs, key=id)  # Fall by to object ids.
+            inputs = sorted(self.inputs, key=id)  # Fall back on object ids.
 
         visited = set()
-        word = []
+        stack = [((self.start, ()), 0)]
+        access_string = []
+        while stack:
+            (curr, suffix), depth = stack.pop()
+            if curr in visited:
+                continue
+            visited.add(curr)
 
-        def _find_accepting_word_recursive(state):
-            if self._label(state):
-                return True
-            visited.add(state)
-            for i in inputs:
-                next_state = self._transition(state, i)
-                if next_state not in visited:
-                    word.append(i)
-                    if _find_accepting_word_recursive(next_state):
-                        return True
-                    word.pop()
+            del access_string[depth:]     # Remove previous path suffix.
+            access_string.extend(suffix)  # Add new path suffix.
 
-        if _find_accepting_word_recursive(self.start):
-            return word
-        else:
-            return None
+            yield (curr, access_string)
+
+            successors = ((self._transition(curr, a), (a,)) for a in inputs)
+            stack.extend((state, depth + 1) for state in successors)
+
+    def states(self) -> frozenset[State]:
+        if self._states is None:
+            states = tuple(s for s, _ in self.walk())
+            object.__setattr__(self, "_states", states)  # Cache states.
+        return frozenset(self._states)
+
+    def find_word(self, label=True) -> Optional[Word]:
+        """DFS for word that accesses a state labeled `label`.
+
+        Returns shortest word if one exists. Otherwise None.
+        """
+        return fn.first(w for s, w in self.walk() if self._label(s) == label)
 
     @boolean_only
     def __invert__(self):

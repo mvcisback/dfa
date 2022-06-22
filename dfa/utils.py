@@ -62,9 +62,7 @@ def paths(dfa_, start, end=None, *, max_length=float('inf'), randomize=False):
 
 def find_word(lang: DFA):
     """Returns a word in the language of DFA or None if language empty."""
-    if lang.outputs <= {True, False}:
-        return lang.find_accepting_word()
-    return next(words(lang), None)
+    return lang.find_word()
 
 
 def words(lang: DFA, max_length=float('inf')):
