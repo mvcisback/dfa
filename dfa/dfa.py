@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import operator
-from functools import wraps
+from functools import cache, wraps
 from typing import Hashable, FrozenSet, Callable, Optional, Sequence, Iterable
 
 import attr
@@ -31,10 +31,10 @@ def bits_needed(n: int) -> int:
 class DFA:
     start: State
     _label: Callable[[State], Letter] = attr.ib(
-        converter=fn.memoize
+        converter=cache
     )
     _transition: Callable[[State, Letter], State] = attr.ib(
-        converter=fn.memoize
+        converter=cache
     )
     inputs: Optional[Alphabet] = attr.ib(
         converter=lambda x: x if x is None else frozenset(x), default=None

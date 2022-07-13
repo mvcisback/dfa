@@ -88,3 +88,15 @@ def test_int_encoding():
         inputs = sorted(lang.inputs)
         lang2 = DFA.from_int(lang.to_int(), inputs)
         assert lang == lang2
+
+
+def test_dill():
+    # Issue #7. Incompatibility with dill.
+    import dill
+
+    dill.dumps(DFA(
+        start=0,
+        inputs={0, 1},
+        label=lambda s: (s % 4) == 3,
+        transition=lambda s, c: (s + c) % 4,
+    ))
