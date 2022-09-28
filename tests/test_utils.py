@@ -92,6 +92,11 @@ def test_enumerate():
     for dfa1, dfa2 in combinations(dfas, 2):
         assert find_equiv_counterexample(dfa1, dfa2) is not None
 
+    # Check first 3 DFAs are as expected with only a single output.
+    dfas = fn.take(7, enumerate_dfas('a'))
+    sizes = [len(d.states()) for d in dfas]
+    assert sizes == [1, 1, 2, 2, 2, 2, 3]
+
 
 def test_words():
     dfa_dict = {

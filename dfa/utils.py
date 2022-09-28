@@ -88,16 +88,19 @@ def find_subset_counterexample(smaller, bigger):
 
 def enumerate_dfas(alphabet, outputs=(False, True)):
     dfas = _enumerate_dfas(alphabet, outputs)
-    yield from fn.distinct(dfas, key=minimize)
+    dfas = map(minimize, dfas)
+    yield from fn.distinct(dfas)
 
 
 def _enumerate_dfas(alphabet, outputs):
     for num_states in fn.count(start=1):
         transitions = defaultdict(dict)
         # Create an iterator of all possible adjacency matrices.
-        adj_list_gnr = itertools.permutations(range(num_states))
+        adj_list_gnr = itertools.product(range(num_states), repeat=num_states)
         # Generate all possible letter -> adjacency matrix maps.
         total_gnr = itertools.product(adj_list_gnr, repeat=len(alphabet))
+
+        #total_gnr = list(total_gnr); breakpoint()
         for adjacency_lists in total_gnr:
             # Construct the DFA transitions based on adjacency lists.
             for char, adj_list in zip(alphabet, adjacency_lists):
