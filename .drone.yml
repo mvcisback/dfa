@@ -3,8 +3,8 @@ name: default
 
 steps:
 - name: test
-  image: python:3.9
+  image: python:3.10
   commands:
   - pip install poetry
   - poetry install
-  - poetry run pytest --flake8 
+  - poetry run pytest
