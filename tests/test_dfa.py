@@ -57,6 +57,12 @@ def test_run_count():
         state = machine.send(1)
     assert count == 4
 
+    assert count_mod4 == count_mod4.advance((0,))
+    assert count_mod4 != count_mod4.advance((1,))
+    assert count_mod4 != count_mod4.advance((1, 1))
+    assert count_mod4 != count_mod4.advance((1, 1, 1))
+    assert count_mod4 == count_mod4.advance((1, 1, 1, 1))
+
 
 def test_int_encoding():
     is_left = DFA(

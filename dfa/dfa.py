@@ -59,6 +59,10 @@ class DFA:
         from dfa.utils import dict2dfa
         return dict2dfa(*dfa2dict(self, reindex=True))
 
+    def minimize(self) -> DFA:
+        from dfa.utils import minimize
+        return minimize(self)
+
     @boolean_only
     def to_int(self, input_order: OrderedAlphabet | None = None) -> int:
         from dfa.utils import dfa2dict, minimize
@@ -230,6 +234,9 @@ class DFA:
 
     def transition(self, word, *, start=None):
         return fn.last(self.trace(word, start=start))
+
+    def advance(self, word, *, start=None):
+        return attr.evolve(self, start=self.transition(word, start=start))
 
     def label(self, word, *, start=None):
         output = self._label(self.transition(word, start=start))

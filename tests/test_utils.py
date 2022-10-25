@@ -83,7 +83,7 @@ def test_minimize():
     }
     dfa1 = dict2dfa(dfa_dict_super, 0)
     true_dfa = dict2dfa(dfa_dict_min, 0)
-    dfa2 = minimize(dfa1)
+    dfa2 = dfa1.minimize()
     assert find_equiv_counterexample(true_dfa, dfa2) is None
 
 
