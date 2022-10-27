@@ -241,6 +241,24 @@ for word in access_strings:
     assert dfa1.transition(word, start=0) == 1
 ```
 
+## DFA minimization
+
+DFAs can be minimized using the `minimize` method.
+
+```python
+my_dfa = my_dfa.minimize()
+```
+
+## DFA advancement (progression)
+
+One can create the DFA starting at the state indexed by a given word by using
+the `advance` method. 
+
+```python
+my_dfa = my_dfa.advance(word)
+```
+
+
 ## Running interactively (Co-Routine API)
 
 `dfa` supports interactively stepping through a `DFA` object via
