@@ -18,7 +18,7 @@ hypothesis = "^6.56.4"
 
 [tool.poetry.dev-dependencies]
 pydot = "^1.4"
-pytest = "^7"
+pytest = "^7.2"
 dill = "^0.3.5"
 
 [tool.poetry.extras]
