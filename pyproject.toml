@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dfa"
 readme="README.md"
-version = "4.6.1"
+version = "4.6.2"
 description = "Python library for modeling DFAs, Moore Machines, and Transition Systems."
 authors = ["Marcell Vazquez-Chanlatte <marcell.vc@eecs.berkeley.edu>"]
 repository = "https://github.com/mvcisback/dfa"
@@ -14,12 +14,12 @@ funcy = "^1.12"
 pydot = {version = "^1.4", optional = true}
 bidict = "^0.22"
 bitarray = "^2.4.0"
-hypothesis = "^6.56.4"
 
 [tool.poetry.dev-dependencies]
 pydot = "^1.4"
 pytest = "^7.2"
 dill = "^0.3.5"
+hypothesis = "^6.56.4"
 
 [tool.poetry.extras]
 draw = ["pydot"]

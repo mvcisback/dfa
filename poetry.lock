@@ -51,7 +51,7 @@ graph = ["objgraph (>=1.7.2)"]
 name = "exceptiongroup"
 version = "1.0.0"
 description = "Backport of PEP 654 (exception groups)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -70,7 +70,7 @@ python-versions = "*"
 name = "hypothesis"
 version = "6.56.4"
 description = "A library for property-based testing"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -123,8 +123,8 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-testing = ["pytest-benchmark", "pytest"]
-dev = ["tox", "pre-commit"]
+dev = ["pre-commit", "tox"]
+testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pydot"
@@ -172,7 +172,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 name = "sortedcontainers"
 version = "2.4.0"
 description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -190,7 +190,7 @@ draw = ["pydot"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "2f8042a61070a984f3d751412c955200f8363e320129a4dd70e03171523c5387"
+content-hash = "91143182becb7668919e2b54a82c4b6de1e4f3720b0f56a6eb902db2bdb46600"
 
 [metadata.files]
 attrs = [
