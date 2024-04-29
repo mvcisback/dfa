@@ -27,6 +27,12 @@ def bits_needed(n: int) -> int:
     return 0 if n < 2 else len(bin(n - 1)) - 2
 
 
+def evolve(d: DFA, *args, **kwargs) -> DFA:
+    kwargs.setdefault('states', None)
+    kwargs.setdefault('hash', None)
+    return attr.evolve(d, *args, **kwargs)
+
+
 @attr.frozen(auto_detect=True)
 class DFA:
     start: State
@@ -236,7 +242,7 @@ class DFA:
         return fn.last(self.trace(word, start=start))
 
     def advance(self, word, *, start=None):
-        return attr.evolve(self, start=self.transition(word, start=start))
+        return evolve(self, start=self.transition(word, start=start))
 
     def label(self, word, *, start=None):
         output = self._label(self.transition(word, start=start))
@@ -288,7 +294,7 @@ class DFA:
 
     @boolean_only
     def __invert__(self):
-        return attr.evolve(self, label=lambda s: not self._label(s))
+        return evolve(self, label=lambda s: not self._label(s))
 
     def _bin_op(self, other, op):
         if self.inputs != other.inputs:
