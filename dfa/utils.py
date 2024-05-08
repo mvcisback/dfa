@@ -1,7 +1,7 @@
 import funcy as fn
 import itertools
 import random
-from collections import deque
+from collections import deque, defaultdict
 from bidict import bidict
 
 from dfa import DFA, State, Letter
@@ -168,3 +168,32 @@ def minimize(orig: DFA):
         label=orig._label,
         transition=lambda s, c: state2rep[orig._transition(s, c)]
     ).normalize()
+
+
+def min_distance_to_accept_by_state(d: DFA):
+    """Returns a dictionary mapping states to the minimum number
+    of tokens necessary to reach an accepting state.
+
+    Note: If a state cannot reach an accepting state, the distance
+          is taken to be infinity.
+    """
+    # Construct inverse transition function.
+    inv_transition = defaultdict(set)
+    for state in d.states():
+        for token in d.inputs:
+            state2 = d._transition(state, token)
+            inv_transition[state2].add((state, token))
+
+    # BFS from the accepting states to the start state.
+    oo = -float('inf')
+    queue = deque([s for s in d.states() if d._label(s)])
+    depths = defaultdict(lambda: -oo, {s: 0 for s in queue})
+    while queue:
+        state = queue.pop()
+        depth = depths[state]
+        for (state2, token) in inv_transition[state]:
+            if state2 in depths:
+                continue  # Visited in BFS -> already have depth.
+            depths[state2] = depth + 1
+            queue.appendleft(state2)
+    return depths

@@ -6,6 +6,7 @@ import dfa
 from dfa.utils import dict2dfa, dfa2dict, paths
 from dfa.utils import find_subset_counterexample, find_equiv_counterexample
 from dfa.utils import enumerate_dfas, minimize, words, find_word
+from dfa.utils import min_distance_to_accept_by_state
 
 
 def test_dict2dfa():
@@ -113,3 +114,23 @@ def test_words():
     xs = set(fn.take(5, words(lang)))
     assert len(xs) == 5
     assert all(lang.label(x) for x in xs)
+
+
+def test_min_distance_to_accept_by_state():
+    def label(s):
+        if s == 'fail': return False
+        return s == 3
+
+    def transition(s, c):
+        if 'fail' in (s, c): return False
+        return min(3, max(0, s + c))
+
+    d = dfa.DFA(start=0,
+                inputs={0,1,'fail'},
+                label=label,
+                transition=transition)
+
+    distances = min_distance_to_accept_by_state(d)
+    for i in range(4):
+        assert distances[i] == 3 - i
+    assert distances['fail'] == float('inf')
