@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dfa"
 readme="README.md"
-version = "4.6.4"
+version = "4.7.0"
 description = "Python library for modeling DFAs, Moore Machines, and Transition Systems."
 authors = ["Marcell Vazquez-Chanlatte <marcell.vc@eecs.berkeley.edu>"]
 repository = "https://github.com/mvcisback/dfa"
