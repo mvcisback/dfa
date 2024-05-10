@@ -116,6 +116,53 @@ def test_words():
     assert all(lang.label(x) for x in xs)
 
 
+def test_find_word_bug():
+    start = 0
+    dfa_dict = {
+        0: (False,
+            {'a': 0,
+             'b': 2,
+             'c': 0,
+             'd': 0,
+             'e': 0,
+             'f': 0,
+             'g': 0,
+             'h': 0,
+             'i': 0,
+             'j': 0,
+             'k': 1,
+             'l': 0}),
+        1: (False,
+            {'a': 1,
+             'b': 1,
+             'c': 1,
+             'd': 0,
+             'e': 1,
+             'f': 1,
+             'g': 1,
+             'h': 1,
+             'i': 1,
+             'j': 1,
+             'k': 1,
+             'l': 1}),
+        2: (True,
+            {'a': 2,
+             'b': 2,
+             'c': 2,
+             'd': 2,
+             'e': 2,
+             'f': 2,
+             'g': 2,
+             'h': 2,
+             'i': 2,
+             'j': 2,
+             'k': 2,
+             'l': 2})}
+    lang = dict2dfa(dfa_dict, start=start)
+    words = (w for s, w in lang.walk() if lang._label(s) is True)
+    assert lang.label(lang.find_word())
+
+
 def test_min_distance_to_accept_by_state():
     def label(s):
         if s == 'fail': return False

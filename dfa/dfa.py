@@ -271,7 +271,7 @@ class DFA:
                 continue
             visited.add(curr)
 
-            del access_string[depth:]     # Remove previous path suffix.
+            del access_string[depth-1:]   # Remove previous path suffix.
             access_string.extend(suffix)  # Add new path suffix.
 
             yield (curr, access_string)
